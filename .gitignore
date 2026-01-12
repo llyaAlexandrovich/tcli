@@ -8,3 +8,7 @@
 # Exclude build directories.
 /build
 /bin
+
+
+# Exclude IDE's info.
+/.vscode
