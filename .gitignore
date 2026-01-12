@@ -1,0 +1,5 @@
+# Exclude the environment variables except the global ones.
+.env
+
+# Exclude temp directory.
+/temp
