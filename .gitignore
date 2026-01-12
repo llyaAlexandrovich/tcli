@@ -3,3 +3,8 @@
 
 # Exclude temp directory.
 /temp
+
+
+# Exclude build directories.
+/build
+/bin
