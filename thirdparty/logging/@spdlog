@@ -1,8 +1,0 @@
-LINK=https://github.com/gabime/spdlog.git
-NAME=spdlog
-DEPS=libfmt
-OTHERS_DEP=
-GEN=CMAKE
-SCRIPT=cmake --build .
-BIN=libspdlog.a
-INCLUDE=include/spdlog

@@ -11,8 +11,10 @@
 
 
 # Exclude thirdparty build directories.
-/thirdparty
-!/thirdparty/^@*
+thirdparty/*/*
+thirdparty/*/*.conf
+!thirdparty/*/^@*
+
 
 # Exclude IDE's info.
 /.vscode

@@ -1,0 +1,8 @@
+LINK=https://github.com/fmtlib/fmt.git
+NAME=fmt
+DEPS=
+OTHERS_DEP=spdlog
+GEN=CMAKE
+SCRIPT=cmake --build .
+BIN=libfmt.a
+INCLUDE=include/fmt
