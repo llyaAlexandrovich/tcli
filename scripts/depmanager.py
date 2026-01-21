@@ -9,7 +9,7 @@ import requests
 
 # TODO: COMPILED flag in blob files is useless for now since we don't
 # TODO: really resolving any dependencies.
-
+# TODO: Add support for tasks that should not be compiled just satisfied.
 
 
 
@@ -26,6 +26,12 @@ def Ping(response: list):
 def RunBlob(FileName: str,
             BlobInfo: list):
     logging.info(f"Trying to run blob - {FileName}")
+
+
+    # Checking if blob's compilation is required.
+    if BlobInfo[1]["COMPILATION_REQUIRED"] == "FALSE":
+        pass
+
     logging.info(f"Change working directory to - {os.path.dirname(FileName)}")
     os.chdir(os.path.dirname(FileName))
 
@@ -140,7 +146,7 @@ def ResolveBlob(version: str,
         logging.info(f"Config directory - {os.path.dirname(BlobFileName)}")
         logging.info(f"Config file name - {os.path.dirname(BlobFileName)}\\{os.path.basename(BlobFileName)[1:]}.conf")
         with open(f"{os.path.dirname(BlobFileName)}\\{os.path.basename(BlobFileName)[1:]}.conf", 'w', encoding="utf-8") as f:
-            f.write(f"DEPMANAGER_VERSION={version}\rBLOB_FILE_NAME={BlobFileName}\rCOMPILED={False}\n")
+            f.write(f"DEPMANAGER_VERSION={version}\rBLOB_FILE_NAME={BlobFileName}\rCOMPILED=FALSE\n")
     # If blob is already configured(config file exists) check config's depmanager version
     # with current depmanager version and if not equal create new config and delete the old one.
     else:
@@ -160,7 +166,7 @@ def ResolveBlob(version: str,
                             os.remove(f"{os.path.dirname(BlobFileName)}\\{os.path.basename(BlobFileName)[1:]}.conf")
                             ResolveBlob(version, BlobFileName)
                     case "COMPILED":
-                        if StringContent[1] != "True":
+                        if StringContent[1] != "TRUE":
                             logging.info(f"Compilatioin required for blob - {os.path.basename(BlobFileName)}")
                         else:
                             logging.info(f"Compilation is not required for blob - {os.path.basename(BlobFileName)}")

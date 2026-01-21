@@ -7,10 +7,10 @@
 #include <string_view>
 #include <filesystem>
 #include <fstream>
-#include <exception>
 
 
-#include "spdlog/spdlog.h"
+
+
 
 /**
  * Internal filesystem namespace.
@@ -32,7 +32,7 @@ namespace fs
      * 
      * @since 1.0.0
      */
-    std::size_t GetFileSize(std::string_view FileName) noexcept;
+    [[noreturn]]void GetFileSize(std::string_view FileName, std::size_t& FileSize) noexcept;
 
 
 
@@ -47,7 +47,7 @@ namespace fs
      * 
      * @since 1.0.0
     */
-    std::string ReadFile(std::string_view FileName) noexcept;
+    [[noreturn]]void ReadFile(std::string_view FileName, std::string& FileContent) noexcept;
 
 
 
@@ -56,11 +56,26 @@ namespace fs
      * 
      * @author Ilya Alexandrovich
      * 
-     * @param FileName read-only name of the file
+     * @param FileName  read-only name of the file
      * 
      * @return return either file content or std::string.empty() == true
      * 
      * @since 1.0.0
      */
-    std::string FindFile(std::string_view FileName) noexcept;
+    [[noreturn]]void FindFile(std::string_view FileName, std::string& FilePath) noexcept;
+
+
+
+    /**
+     * Check whether file exists or not.
+     * 
+     * @author Ilya Alexandrovich
+     * 
+     * @param FileName  read-only name of the file
+     * 
+     * @return returh either true if file exists or false
+     * 
+     * @since 1.0.0
+     */
+    [[nodiscard]]bool IsFileExists(std::string_view FileName) noexcept;
 }
