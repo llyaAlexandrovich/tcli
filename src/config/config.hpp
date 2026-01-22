@@ -12,7 +12,12 @@
 
 
 
-[[nodiscard]]bool IsConfigsExists(std::vector<std::string> ConfigsNames) noexcept;
+
+
+
+
+
+[[nodiscard]]std::vector<bool> Configure() noexcept;
 
 
 
@@ -34,15 +39,38 @@
 
 
 /**
+ * Release the previously locked files.
  * 
+ * @author Ilya Alexandrovich
+ * 
+ * @param FileDescriptors  list of descriptors of all previously locked files
+ * 
+ * @since 1.0.0
  */
-[[noreturn]]void AcquireFiles(std::vector<HANDLE> FileDescriptors) noexcept;
+[[noreturn]]void ReleaseFiles(std::vector<HANDLE> FileDescriptors) noexcept;
 
 
 /**
+ * Check whether required directories exists and create them if not.
  * 
+ * @author Ilya Alexandrovich
+ * 
+ * @since 1.0.0
  */
-[[nodiscard]]std::vector<std::string> CheckAndCreateRequiredDirictories() noexcept;
+[[noreturn]]void CheckAndCreateRequiredDirictories() noexcept;
+
+
+
+/**
+ * Check whether all required configs exists and configured.
+ * 
+ * @author Ilya Alexandrovich
+ * 
+ * @return return whether true if all configs exist and configured or false
+ * 
+ * @since 1.0.0
+ */
+[[nodiscard]]bool CheckConfigs() noexcept;
 
 #else // Linux and others
 

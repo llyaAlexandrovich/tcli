@@ -15,6 +15,7 @@ int main(int argc, char **argv)
     spdlog::set_level(spdlog::level::info);
     spdlog::set_default_logger(root);
 
+
     // Basic log info. Trying to be consistent with Telegram logs.
     spdlog::info("Launched version: {}, install beta: [{}], debug mode: [{}]", NumVersion, IsBeta, DEBUG);
     spdlog::info("Executable dir: {}{}\\, name: {}", std::filesystem::path(argv[0]).root_path(), std::filesystem::path(argv[0]).relative_path(), std::filesystem::path(argv[0]).filename());
