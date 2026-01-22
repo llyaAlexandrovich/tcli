@@ -78,4 +78,17 @@ namespace fs
      * @since 1.0.0
      */
     [[nodiscard]]bool IsFileExists(std::string_view FileName) noexcept;
+
+
+
+    /**
+     * Get current directory.
+     * 
+     * @author Ilya Alexandrovich
+     * 
+     * @return return current directory
+     * 
+     * @since 1.0.0
+     */
+    [[nodiscard]]std::string GetCurrentDir() noexcept;
 }

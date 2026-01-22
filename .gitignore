@@ -2,12 +2,12 @@
 .env
 
 # Exclude temp directory.
-/temp
+temp
 
 
 # Exclude build directories.
-/build
-/bin
+build
+bin
 
 
 # Exclude thirdparty build directories.
@@ -17,8 +17,8 @@ thirdparty/*/*.conf
 
 
 # Exclude IDE's info.
-/.vscode
+.vscode
 
 
 # Exclude any caches.
-/__pycache__
+__pycache__

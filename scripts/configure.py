@@ -41,7 +41,7 @@ if __name__ == "__main__":
     
 
     # Initialize logging.
-    logging.basicConfig(format="%(asctime)s - %(filename)s - %(levelname)s - %(message)s",
+    logging.basicConfig(format="[%(asctime)s] - %(message)s",
                         datefmt="%Y-%m-%d %H:%M:%S%z",
                         level=env["LOGGING_LEVEL"],
                         encoding="utf-8",

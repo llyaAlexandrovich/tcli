@@ -52,4 +52,11 @@ namespace fs
         }
         return false;
     }
+
+
+
+    [[nodiscard]]std::string GetCurrentDir() noexcept
+    {
+        return std::filesystem::current_path().string();
+    }
 }
