@@ -11,7 +11,7 @@
 
 # Features  
 
-- [ ] Support every possible telegram message types
+- [-] Support every possible telegram message types
     - [ ] Text
     - [ ] Image
     - [ ] Audio
