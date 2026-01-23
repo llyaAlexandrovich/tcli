@@ -4,7 +4,7 @@
 # Overview  
 ## TCli is a simple cli-based program that able to work as the Telegram© itself in graphic deprived environment. This program has two configurations for every release -  
 
-1. Portable - program contains all the date it requires and work as thestatic monolith with configs stored outside as the only dependency.
+1. Portable - program contains all the date it requires and work as the static monolith with configs stored outside as the only dependency.
 
 2. SystemWide - program trying to use as much preinstalled software as possible and truncate itself to the lowest possible size. Configs and other requried data stored in system respectively based on system program was build to. Program is rather to be reinstalled then moved.
 
