@@ -4,6 +4,6 @@
 [submodule "fmt"]
 	path = thirdparty/fmt
 	url = https://github.com/fmtlib/fmt.git
-[submodule "thirdparty/tdlib"]
-	path = tdlib
+[submodule "tdlib"]
+	path = thirdparty/tdlib
 	url = https://github.com/tdlib/td
