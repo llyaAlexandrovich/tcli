@@ -28,8 +28,8 @@
     - [ ] Hardware-level protection
     - [ ] Anonymity
 - [ ] Useability
-    - [ ] High-end audio for vedio and audio
-    - [ ] Chracter-based video and audio render
+    - [ ] High-end audio for video and audio
+    - [ ] Character-based video and audio render
     - [ ] Interface simplicity
     - [ ] Interface stability
     - [ ] Overall stability
