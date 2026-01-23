@@ -1,3 +1,9 @@
 [submodule "tdlib"]
 	path = thitdparty/tdlib
 	url = https://github.com/tdlib/td
+[submodule "spdlog"]
+	path = thirdparty/spdlog
+	url = https://github.com/gabime/spdlog.git
+[submodule "fmt"]
+	path = thirdparty/fmt
+	url = https://github.com/fmtlib/fmt.git
