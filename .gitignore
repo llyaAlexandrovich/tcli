@@ -22,3 +22,8 @@ thirdparty/*/*.conf
 
 # Exclude any caches.
 __pycache__
+
+
+# Some lately deprecated files.
+scripts/configure.py
+scripts/depmanager.py
