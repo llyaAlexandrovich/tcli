@@ -55,13 +55,22 @@
             spdlog::info("Directory already exists - /cache");
         }
     }
+
+    if(!CreateDirectoryW(L"tdata/user_data/media_cache", NULL))
+    {
+        if(GetLastError() == 0x183)
+        {
+            spdlog::info("Directory already exists - /media_cache");
+        }
+    }
 }
 
 
-
+// TODO: i'm not done with understanding configs in telegram this functions is
+// TODO: not even under the maintain for now.
 [[nodiscard]]bool CheckConfigs() noexcept
 {
-
+    //if(!fs::IsFileExists("tdata/"))
 }
 
 
