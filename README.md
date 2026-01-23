@@ -11,33 +11,33 @@
 
 # Features  
 
-- [x] Support every possible telegram message types
-    - [x] Text
-    - [x] Image
-    - [x] Audio
-    - [x] Video
-    - [x] File
-    - [x] Animation
-    - [x] Button
-    - [x] Keyboards
-- [x] High-end security
-    - [x] ZeroTrust
-    - [x] Internal Encryption
-    - [x] Hardware-based encryption
-    - [x] Hardware Encryption features
-    - [x] Hardware-level protection
-    - [x] Anonymity
-- [x] Useability
-    - [x] High-end audio for vedio and audio
-    - [x] Chracter-based video and audio render
-    - [x] Interface simplicity
-    - [x] Interface stability
-    - [x] Overall stability
-    - [x] Optimization
-- [x] Long-time support
-    - [x] Using modern features
-    - [x] Automatic-based compilation
-    - [x] Hard versioning
+- [] Support every possible telegram message types
+    - [] Text
+    - [] Image
+    - [] Audio
+    - [] Video
+    - [] File
+    - [] Animation
+    - [] Button
+    - [] Keyboards
+- [] High-end security
+    - [] ZeroTrust
+    - [] Internal Encryption
+    - [] Hardware-based encryption
+    - [] Hardware Encryption features
+    - [] Hardware-level protection
+    - [] Anonymity
+- [] Useability
+    - [] High-end audio for vedio and audio
+    - [] Chracter-based video and audio render
+    - [] Interface simplicity
+    - [] Interface stability
+    - [] Overall stability
+    - [] Optimization
+- [] Long-time support
+    - [] Using modern features
+    - [] Automatic-based compilation
+    - [] Hard versioning
 
 
 # Build
