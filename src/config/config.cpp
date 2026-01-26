@@ -40,6 +40,14 @@
         }
     }
 
+    if(!CreateDirectoryW(L"tdata/D877F783D5D3EF8C", NULL))
+    {
+        if(GetLastError() == 0x183)
+        {
+            spdlog::info("Directory already exists - tdata/D877F783D5D3EF8C");
+        }
+    }
+
     if(!CreateDirectoryW(L"tdata/user_data", NULL))
     {
         if(GetLastError() == 0x183)
