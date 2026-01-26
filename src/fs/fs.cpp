@@ -32,7 +32,11 @@ namespace fs
 
 
 
+<<<<<<< HEAD
     [[noreturn]] void ReadFilePart(std::string_view FileName, std::string& FileContent, std::size_t BytesToRead) noexcept
+=======
+    [[noreturn]] void ReadPartFile(std::string_view FileName, std::string& FileContent, std::size_t BytesToRead) noexcept
+>>>>>>> 6165bd7599bc2d4e1511b58f59bf6dd337616a84
     {
         std::ifstream FileStream(FileName.data());
 

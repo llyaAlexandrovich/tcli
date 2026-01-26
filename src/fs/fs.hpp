@@ -44,6 +44,11 @@ namespace fs
      * 
      * @param FileName  read-only name of the file
      * @param FileContent  buffer to read file data to
+<<<<<<< HEAD
+=======
+     * 
+     * @return return either file content or std::string.empty() == true
+>>>>>>> 6165bd7599bc2d4e1511b58f59bf6dd337616a84
      * 
      * @since 1.0.0
     */
