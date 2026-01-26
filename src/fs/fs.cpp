@@ -32,6 +32,22 @@ namespace fs
 
 
 
+    [[noreturn]] void ReadFilePart(std::string_view FileName, std::string& FileContent, std::size_t BytesToRead) noexcept
+    {
+        std::ifstream FileStream(FileName.data());
+
+        if(!FileStream.is_open())
+        {
+            return;
+        }
+
+        FileStream.read(FileContent.data(), BytesToRead);
+
+        FileStream.close();
+    }
+
+
+
     [[noreturn]]void FindFile(std::string_view FileName, std::string& FilePath) noexcept
     {
         for(const auto& entry: std::filesystem::recursive_directory_iterator(std::filesystem::current_path()))
