@@ -21,7 +21,7 @@
  */
 namespace fs
 {
-    /**
+     /**
      * Get size of the file.
      * 
      * @author Ilya Alexandrovich
@@ -33,30 +33,25 @@ namespace fs
      * 
      * @since 1.0.0
      */
-    [[noreturn]]void GetFileSize(std::string_view FileName, std::size_t& FileSize) noexcept;
+     [[noreturn]]void GetFileSize(std::string_view FileName, std::size_t& FileSize) noexcept;
 
 
 
-    /**
+     /**
      * Read entire file.
      * 
      * @author Ilya Alexandrovich
      * 
      * @param FileName  read-only name of the file
      * @param FileContent  buffer to read file data to
-<<<<<<< HEAD
-=======
-     * 
-     * @return return either file content or std::string.empty() == true
->>>>>>> 6165bd7599bc2d4e1511b58f59bf6dd337616a84
      * 
      * @since 1.0.0
     */
-    [[noreturn]]void ReadFile(std::string_view FileName, std::string& FileContent) noexcept;
+     [[noreturn]]void ReadFile(std::string_view FileName, std::string& FileContent) noexcept;
 
 
 
-    /**
+     /**
      * Read part of the file.
      * 
      * @author Ilya Alexandrovich
@@ -67,11 +62,11 @@ namespace fs
      * 
      * @since 1.0.0
      */
-    [[noreturn]] void ReadFilePart(std::string_view FileName, std::string& FileContent, std::size_t BytesToRead) noexcept;
+     [[noreturn]] void ReadFilePart(std::string_view FileName, std::string& FileContent, std::size_t BytesToRead) noexcept;
 
 
 
-    /**
+     /**
      * Search for a file in the current and all included directories.
      * 
      * @author Ilya Alexandrovich
@@ -83,11 +78,11 @@ namespace fs
      * 
      * @since 1.0.0
      */
-    [[noreturn]]void FindFile(std::string_view FileName, std::string& FilePath) noexcept;
+     [[noreturn]]void FindFile(std::string_view FileName, std::string& FilePath) noexcept;
 
 
 
-    /**
+     /**
      * Check whether file exists or not.
      * 
      * @author Ilya Alexandrovich
@@ -98,11 +93,11 @@ namespace fs
      * 
      * @since 1.0.0
      */
-    [[nodiscard]]bool IsFileExists(std::string_view FileName) noexcept;
+     [[nodiscard]]bool IsFileExists(std::string_view FileName) noexcept;
 
 
 
-    /**
+     /**
      * Get current directory.
      * 
      * @author Ilya Alexandrovich
@@ -111,5 +106,5 @@ namespace fs
      * 
      * @since 1.0.0
      */
-    [[nodiscard]]std::string GetCurrentDir() noexcept;
+     [[nodiscard]]std::string GetCurrentDir() noexcept;
 }
