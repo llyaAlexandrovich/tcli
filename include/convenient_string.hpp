@@ -6,7 +6,7 @@
 #include <string>
 #include <string_view>
 #include <vector>
-
+#include <cctype>
 
 
 
@@ -27,13 +27,13 @@ public:
      * 
      * @since 1.0.0
      */
-    [[nodiscard]]std::vector<std::string> extern_split(char const delimiter) noexcept
+    [[nodiscard]] std::vector<std::string> extern_split(char const delimiter) noexcept
     {
-        std::vector<std::string> output;
+        std::vector<std::string>* output = std::make_shared<std::vector<std::string>>();
         std::string StrippedString = this->extern_strip();
         std::string word;
 
-        for(int counter = 0; counter < this->length(); ++counter)
+        for(int counter = 0; counter != this->length(); ++counter)
         {
             if(StrippedString[counter] == delimiter)
             {
@@ -66,7 +66,7 @@ public:
     {
         this->strip();
 
-        for(int counter = 0; counter < this->length(); ++counter)
+        for(int counter = 0; counter != this->length(); ++counter)
         {
             if(this[counter] == delimiter)
             {
@@ -87,19 +87,19 @@ public:
      * 
      * @since 1.0.0
      */
-    [[nodiscard]] std::string extern_strip() noexcept
-    {
-        std::string output;
-        output.assign(this->data());
-        for(int counter = 0; counter < output.length(); ++counter)
-        {
-            if(output[counter] == '\n' || output[counter] == '\r')
-            {
-                output.erase(counter, 1);
-            }
-        }
-        return output;
-    }
+    //[[nodiscard]] std::string extern_strip() noexcept
+    //{
+    //    std::string output;
+    //    output.assign(this->data());
+    //    for(int counter = 0; counter != output.length(); ++counter)
+    //    {
+    //        if(output[counter] == '\n' || output[counter] == '\r')
+    //        {
+    //            output.erase(counter, 1);
+    //        }
+    //    }
+    //    return output;
+    //}
 
 
 
@@ -113,12 +113,26 @@ public:
      */
     [[noreturn]] void strip() noexcept
     {
-        for(int counter = 0; counter < this->length(); ++counter)
+        for(int counter = 0; counter != this->length(); ++counter)
         {
             if(this[counter] == "\n" || this[counter] == "\r")
             {
                 this->erase(counter, 1);
             }
         }
+    }
+
+
+
+    /**
+     * Convert string characters to lower.
+     * 
+     * @author Ilya Alexandrovich
+     * 
+     * @since 1.0.0
+     */
+    [[noreturn]] void to_lower() noexcept
+    {
+        std::transform(this->begin(), this->end(), this->begin(), [](unsigned char c){ return std::tolower(c); });
     }
 };
