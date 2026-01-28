@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "fs/fs.hpp"
-#include "spdlog/spdlog.h"
+
 
 
 
@@ -34,7 +34,7 @@
  * 
  * @since 1.0.0
  */
-[[nodiscard]]std::vector<HANDLE> LockFiles() noexcept;
+[[nodiscard]] std::vector<HANDLE> LockFiles() noexcept;
 
 
 
@@ -47,7 +47,7 @@
  * 
  * @since 1.0.0
  */
-[[noreturn]]void ReleaseFiles(std::vector<HANDLE> FileDescriptors) noexcept;
+[[noreturn]] void ReleaseFiles(std::vector<HANDLE> FileDescriptors) noexcept;
 
 
 /**
@@ -57,7 +57,7 @@
  * 
  * @since 1.0.0
  */
-[[noreturn]]void CheckAndCreateRequiredDirictories() noexcept;
+[[noreturn]] void CheckAndCreateRequiredDirictories() noexcept;
 
 
 
@@ -70,7 +70,11 @@
  * 
  * @since 1.0.0
  */
-[[nodiscard]]bool CheckConfigs() noexcept;
+[[nodiscard]] bool CheckConfigs() noexcept;
+
+
+
+[[nodiscard]] 
 
 #else // Linux and others
 

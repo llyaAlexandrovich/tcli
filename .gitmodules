@@ -7,3 +7,6 @@
 [submodule "tdlib"]
 	path = thirdparty/tdlib
 	url = https://github.com/tdlib/td
+[submodule "thirdparty/openssl"]
+	path = thirdparty/openssl
+	url = https://github.com/openssl/openssl.git

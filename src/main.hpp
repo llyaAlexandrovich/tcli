@@ -43,6 +43,7 @@ static std::string const HelpPage = std::format("TCli v{} by Ilya Alexandrovich"
 // This number represents 10MB using Mib IEC system(2^20 * 10).
 static int const MaxLoggerFileSize = 10485760;
 
+
 // This number represents the maximum number of log files.
 static int const MaxNumberOfLoggerFiles = 1;
 
@@ -50,8 +51,14 @@ static int const MaxNumberOfLoggerFiles = 1;
 // Indicates whether beta version is installed.
 static bool const IsBeta = false;
 
+
 // Debug.
 #ifndef DEBUG
 #define NDEBUG
 #define DEBUG false
 #endif
+
+
+// User states.
+static bool authorized = false;
+

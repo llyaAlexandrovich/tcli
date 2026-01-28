@@ -13,21 +13,21 @@
 
 
 #if defined _WIN32 || defined _WIN64 // Windows
-[[nodiscard]]std::vector<HANDLE> LockFiles() noexcept
+[[nodiscard]] std::vector<HANDLE> LockFiles() noexcept
 {
 
 }
 
 
 
-[[noreturn]]void ReleaseFiles(std::vector<HANDLE> FileDescriptors) noexcept
+[[noreturn]] void ReleaseFiles(std::vector<HANDLE> FileDescriptors) noexcept
 {
 
 }
 
 
 
-[[noreturn]]void CheckAndCreateRequiredDirictories() noexcept
+[[noreturn]] void CheckAndCreateRequiredDirictories() noexcept
 {
     // NOTE: Despite the function's name we don't really check if directory exists
     // and create it if not. We basically leaning on ERROR_ALREADY_EXISTS error
@@ -76,7 +76,7 @@
 
 // TODO: i'm not done with understanding configs in telegram this functions is
 // TODO: not even under the maintain for now.
-[[nodiscard]]bool CheckConfigs() noexcept
+[[nodiscard]] bool CheckConfigs() noexcept
 {
     //if(!fs::IsFileExists("tdata/"))
 }

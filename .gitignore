@@ -27,3 +27,12 @@ __pycache__
 # Some lately deprecated files.
 scripts/configure.py
 scripts/depmanager.py
+
+
+# Exclude lib.
+lib
+
+
+# Eclude include.
+include
+!include/convinient_string.hpp
