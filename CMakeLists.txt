@@ -14,9 +14,7 @@ project(TCli VERSION ${TCLI_VERSION} LANGUAGES CXX) # Project basis.
 # Subdirectories.
 add_subdirectory(src)
 add_subdirectory(src/fs)
-add_subdirectory(src/config)
 add_subdirectory(src/helper)
-add_subdirectory(src/security)
 add_subdirectory(src/render)
 add_subdirectory(src/auth)
 

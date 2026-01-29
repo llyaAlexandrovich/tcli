@@ -55,6 +55,7 @@
 [[nodiscard]] int GetMinorVersion(std::string StringVersion) noexcept;
 
 
+
 /**
  * Get patch number of the version from the string version representation.
  * 
