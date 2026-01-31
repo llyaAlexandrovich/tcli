@@ -16,7 +16,7 @@ add_subdirectory(src)
 add_subdirectory(src/fs)
 add_subdirectory(src/helper)
 add_subdirectory(src/render)
-add_subdirectory(src/auth)
+add_subdirectory(src/localization)
 
 
 

@@ -8,8 +8,7 @@
 
 
 int main(int argc, char **argv)
-{
-    
+{   
     for(int counter = 1; counter < argc; ++counter)
     {
         std::string_view token(argv[counter]);

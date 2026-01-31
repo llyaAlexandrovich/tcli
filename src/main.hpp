@@ -11,6 +11,7 @@
 
 
 #include "helper/helper.hpp"
+#include "localization/localization.hpp"
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/rotating_file_sink.h"
 
@@ -22,6 +23,7 @@
  * NONE => run program with the default settings
  * -H --help => show help page and exit
  * -U --user => specify the user for login
+ * -L --locale => specify locale
  * --proxy => specify proxy settings
  */
 int main(int argc, char **argv);
@@ -60,4 +62,5 @@ static bool const IsBeta = false;
 
 // User states.
 static bool authorized = false;
-
+static std::string locale = GetSystemLocale();
+static std::string const _locale = "en"; // Default locale.
