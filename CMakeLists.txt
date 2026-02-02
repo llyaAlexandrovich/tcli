@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 4.2)
+cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 
 
 set(TCLI_VERSION "1.0.0")           # Set program version.
@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD "23")        # Set cxx version for cmake build.
 set(CMAKE_CXX_STANDARD_REQUIRED ON) # Force to have required cxx version.
 
 
-s
+
 project(TCli VERSION ${TCLI_VERSION} LANGUAGES CXX) # Project basis.
 
 
@@ -36,6 +36,7 @@ add_executable(tcli main.cpp)
 
 
 # Linking.
-target_link_libraries(tcli libcrypto.lib)
-target_link_libraries(tcli libfmt.a)
-target_link_libraries(tcli libspdlog.a)
+target_link_libraries(tcli PRIVATE libcrypto.lib)
+target_link_libraries(tcli PRIVATE libfmt.a)
+target_link_libraries(tcli PRIVATE libspdlog.a)
+target_link_libraries(YourTarget PRIVATE Td::TdStatic)
