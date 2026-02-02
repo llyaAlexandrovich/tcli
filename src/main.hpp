@@ -12,9 +12,15 @@
 
 #include "helper/helper.hpp"
 #include "localization/localization.hpp"
+
+
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/rotating_file_sink.h"
 
+
+#include "td/telegram/Client.h"
+#include "td/telegram/td_api.h"
+#include "td/telegram/td_api.hpp"
 
 
 
