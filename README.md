@@ -27,6 +27,7 @@
     - [ ] Interface stability
     - [ ] Overall stability
     - [ ] Optimization
+    - [ ] Hot-keys
 - [ ] Long-time support
     - [ ] Using modern features
     - [ ] Automatic-based compilation
