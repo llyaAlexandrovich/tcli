@@ -149,7 +149,7 @@ public:
     }
 
 
-    [[noreturn]] void run()
+    void run()
     {
         while(true)
         {
@@ -253,7 +253,7 @@ private:
 
 
     // Restart current tcli instance. Not the whole app.
-    [[noreturn]] void restart()
+    void restart()
     {
         ClientManager.reset();
         *this = tcli();
@@ -261,7 +261,7 @@ private:
 
 
     // Send message to the query.
-    [[noreturn]] void SendQuery(td_api::object_ptr<td_api::Function> func, std::function<void(TdObject)> handler)
+    void SendQuery(td_api::object_ptr<td_api::Function> func, std::function<void(TdObject)> handler)
     {
         auto QueryID = NextQueryID();
         if(handler)
@@ -274,7 +274,7 @@ private:
 
 
     // Processing response.
-    [[noreturn]] void ProcessResponse(td::ClientManager::Response response)
+    void ProcessResponse(td::ClientManager::Response response)
     {
         if(!response.object)
         {
@@ -296,7 +296,7 @@ private:
 
 
     // Process updates.
-    [[noreturn]] void ProcessUpdate(TdObject update) // td_api::object_ptr<td_api::Object>
+    void ProcessUpdate(TdObject update) // td_api::object_ptr<td_api::Object>
     {
         td_api::downcast_call(
         *update, 
@@ -346,7 +346,7 @@ private:
 
 
     // Authorization states.
-    [[noreturn]] void OnAuthStateUpdate()
+    void OnAuthStateUpdate()
     {
         ++AuthQueryID;
         td_api::downcast_call(*AuthtorizationState, overloaded(
@@ -433,7 +433,7 @@ private:
 
 
     // Check for authentication errors.
-    [[noreturn]] void CheckAuthError(TdObject object)
+    void CheckAuthError(TdObject object)
     {
         if(object->get_id() == td_api::error::ID)
         {

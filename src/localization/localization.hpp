@@ -22,7 +22,7 @@
  * 
  * @since 1.0.0
  */
-[[nodiscard]] std::string GetSystemLocale() noexcept
+std::string GetSystemLocale() noexcept
 {
     std::wstring WinLocaleName;
 
@@ -50,7 +50,7 @@
  * 
  * @since 1.0.0
  */
-[[nodiscard]] std::string GetSystemLocaleWide() noexcept
+std::string GetSystemLocaleWide() noexcept
 {
     std::wstring WinLocaleName;
 
@@ -80,7 +80,7 @@
  * 
  * @since 1.0.0
  */
-[[nodiscard]] std::string GetSystemLocale() noexcept
+std::string GetSystemLocale() noexcept
 {
     const char* LinuxLocaleName = std::setlocale(LC_ALL, "");
     if(LinuxLocaleName != nullptr)
@@ -103,7 +103,7 @@
  * 
  * @since 1.0.0
  */
-[[nodiscard]] std::string GetSystemLocaleWide() noexcept
+std::string GetSystemLocaleWide() noexcept
 {
     const char* LinuxLocaleName = std::setlocale(LC_ALL, "");
     if(LinuxLocaleName != nullptr)

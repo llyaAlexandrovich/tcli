@@ -34,7 +34,7 @@ public:
         stream = std::stringstream();
 
 
-    };
+    }
 
 
 
@@ -59,7 +59,7 @@ private:
      * 
      * @since 1.0.0
      */
-    [[noreturn]] void SetConsoleParams() noexcept
+    void SetConsoleParams() noexcept
     {
         stream.imbue(std::locale(_locale.data()));
     }
@@ -73,7 +73,7 @@ private:
      * 
      * @since 1.0.0
      */
-    [[noreturn]] void ClearScreen() noexcept
+    void ClearScreen() noexcept
     {
         stream.flush();
     }
@@ -87,9 +87,9 @@ private:
      * 
      * @since 1.0.0
      */
-    [[noreturn]] void DrawDefaultScreen()
+    void DrawDefaultScreen()
     {
-        
+
     }
 
 
@@ -103,7 +103,7 @@ private:
      * 
      * @since 1.0.0
      */
-    [[noreturn]] void GetScreenParams() noexcept
+    void GetScreenParams() noexcept
     {
         CONSOLE_SCREEN_BUFFER_INFO csbi;
         if(GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi))
@@ -125,7 +125,7 @@ private:
      * 
      * @since 1.0.0
      */
-    [[noreturn]] void GetScreenParams() noexcept
+    void GetScreenParams() noexcept
     {
         struct winsize w;
         if(!ioctl(STDOUT_FILENO, TIOCGWINSZ, &w)))
