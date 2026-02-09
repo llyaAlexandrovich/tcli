@@ -9,15 +9,32 @@
 #include <map>
 #include <memory>
 #include <vector>
+#include <codecvt>
 
 
 
 #include "../../localization/localization.hpp"
 
 
+#include "td/telegram/Client.h"
+#include "td/telegram/td_api.h"
+#include "td/telegram/td_api.hpp"
 
 
 
+#include "tdhelper/tdtypes.hpp"
+
+
+
+
+
+/**
+ * UI Renderer class.
+ * 
+ * @author Ilya Alexandrovich
+ * 
+ * 
+ */
 class UIRender
 {
 public:
@@ -31,8 +48,18 @@ public:
             _locale = locale;
         }
 
-        stream = std::stringstream();
+        stream = std::wstringstream();
+        
 
+
+        DrawDefaultScreen();
+
+        DrawMainContent();
+    }
+
+
+    void Render()
+    {
 
     }
 
@@ -49,7 +76,12 @@ private:
 
 
     // Current console stream.
-    std::stringstream stream;
+    std::wstringstream stream;
+
+
+    // Codecvt object: string => wstring
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+
 
 
     /**
@@ -89,8 +121,65 @@ private:
      */
     void DrawDefaultScreen()
     {
+        ClearScreen();
+        DrawBorders();
+    }
+
+
+
+    /**
+     * Draw borders.
+     * 
+     * @author Ilya Alexandrovich
+     * 
+     * @since 1.0.0
+     */
+    void DrawBorders()
+    {
+        // Above border.
+        stream << "\x1b[104m"; // Set up blue color.
+        for(short counter = 0; counter < width; ++counter) stream << ' ';
+        stream << "\x1b[0m" << std::endl; // Reset color scheme.
+    }
+
+
+
+    /**
+     * Draw chat(main) content;
+     * 
+     * @author Ilya Alexandrovich
+     * 
+     * 
+     */
+    void DrawMainContent(td::tl_object_ptr<td_api::chats> chats, td::)
+    {
 
     }
+
+
+
+    /**
+     * 
+     */
+    std::string_view ShowChatUnit(td_api::object_ptr<td_api::chat> chat, td_api::object_ptr<td_api::message> message, td_api::object_ptr<td_api::user> user)
+    {
+        std::wstring output;
+        td_api::downcast_call(*message->sender_id_,
+            overloaded(
+                [&](td_api::messageSenderUser& user)
+                {
+                    
+                },
+                [&](td_api::messageSenderChat& chat)
+                {
+                    output = GROUP_CHAT_PREFIX;
+                    
+                }
+        ));
+
+        output += converter.from_bytes(chat->title_.data());
+    }
+
 
 
 #if defined _WIN32 || defined _WIN64 // Windows.
