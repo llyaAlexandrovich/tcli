@@ -17,6 +17,7 @@ add_subdirectory(src)
 add_subdirectory(src/helper)
 add_subdirectory(src/render)
 add_subdirectory(src/localization)
+add_subdirectory(src/tdhelper)
 
 
 
