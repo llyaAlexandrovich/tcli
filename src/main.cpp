@@ -9,13 +9,16 @@
 
 int main(int argc, char **argv)
 {   
+    _setmode(_fileno(stdout), _O_U16TEXT);
+
+
     std::string locale, user;
     for(int counter = 1; counter < argc; ++counter)
     {
         std::string_view token(argv[counter]);
         if(token == "-H" || token == "--help")
         {
-            std::cout << HelpPageText << std::endl;
+            std::wcout << HelpPageText << std::endl;
             return 0;
         }
         //else if(token == "-U" || token == "--user")

@@ -9,6 +9,7 @@
 #include <thread>
 #include <map>
 #include <memory>
+#include <atomic>
 
 
 
@@ -24,6 +25,13 @@
 #include "td/telegram/Client.h"
 #include "td/telegram/td_api.h"
 #include "td/telegram/td_api.hpp"
+
+
+#include <io.h>
+#include <fcntl.h>
+
+
+#include "tdhelper/tdtypes.hpp"
 
 
 
@@ -59,7 +67,7 @@ static double const TimeOut = 10.0;
 
 
 // Help page content.
-static std::string const HelpPageText = std::format("TCli v{} by Ilya Alexandrovich", VersionAsString);
+static std::wstring const HelpPageText = std::format("TCli v{} by Ilya Alexandrovich", VersionAsString);
 
 
 // This number represents 10MB using Mib IEC system(2^20 * 10).
@@ -99,36 +107,7 @@ static std::string const DeviceModel = "Desktop";
 
 
 
-// Type Dispatching.
-namespace detail {
-template <class... Fs>
-struct overload;
 
-
-template <class F>
-struct overload<F> : public F {
-    explicit overload(F f) : F(f) {
-}
-};
-
-
-template <class F, class... Fs>
-struct overload<F, Fs...> : public overload<F>, public overload<Fs...> {
-    overload(F f, Fs... fs) : overload<F>(f), overload<Fs...>(fs...) {}
-    using overload<F>::operator();
-    using overload<Fs...>::operator();
-};
-
-}  // namespace detail
-
-
-template <class... F>
-auto overloaded(F... f) {
-    return detail::overload<F...>(f...);
-}
-
-
-namespace td_api = td::td_api;
 
 
 /**
@@ -143,7 +122,7 @@ public:
     tcli()
     {
         td::ClientManager::execute(td_api::make_object<td_api::setLogVerbosityLevel>(1));
-        ClientManager = std::make_unique<td::ClientManager>();
+        ClientManager = std::make_shared<td::ClientManager>();
         ClientID = ClientManager->create_client_id();
         SendQuery(td_api::make_object<td_api::getOption>("version"), {});
     }
@@ -170,15 +149,19 @@ public:
 
 
 private:
-    using TdObject = td_api::object_ptr<td_api::Object>;
-
     // ClientManager instance should be transfered to other
     // threads as well.
-    std::unique_ptr<td::ClientManager> ClientManager;
+    std::shared_ptr<td::ClientManager> ClientManager;
+
+
+    // Current instance mutex to work with queue.
+    std::mutex mutex;
+
 
     // This type of initialization guarantee that value will be
     // preinit with 0.
     std::int32_t ClientID{0};
+
 
     // Basic Authorization class.
     td_api::object_ptr<td_api::AuthorizationState> AuthtorizationState;
@@ -198,14 +181,21 @@ private:
 
 
     // Fast-Access data.
-    //
+    // Callback function handlers.
     std::map<std::uint64_t, std::function<void(TdObject)>> handlers;
 
-    //
+    // Name of the chats users.
     std::map<std::int64_t, td_api::object_ptr<td_api::user>> users;
 
-    //
+    // Names of the chats.
     std::map<std::int64_t, std::string> ChatTitle;
+
+    // List of chats messages.
+    std::map<std::int64_t, td_api::object_ptr<td_api::message>> ChatLastMessage;
+
+    // Chat position by chat id.
+    std::vector<std::int64_t> ChatPosition;
+
 
 
     // Return next query ID.
@@ -301,14 +291,15 @@ private:
         td_api::downcast_call(
         *update, 
                 overloaded(
-                    [this](td_api::updateAuthorizationState &update_authorization_state) 
+                    [this](td_api::updateAuthorizationState &UpdateAuthtorizationState) 
                     {
-                        AuthtorizationState = std::move(update_authorization_state.authorization_state_);
+                        AuthtorizationState = std::move(UpdateAuthtorizationState.authorization_state_);
                         OnAuthStateUpdate();
                     },
-                    [this](td_api::updateNewChat &update_new_chat) 
+                    [this](td_api::updateNewChat &UpdateNewChat) 
                     {
-                        ChatTitle[update_new_chat.chat_->id_] = update_new_chat.chat_->title_;
+                        ChatTitle[UpdateNewChat.chat_->id_] = UpdateNewChat.chat_->title_;
+                        ChatLastMessage[UpdateNewChat.chat_->id_] = std::move(UpdateNewChat.chat_->last_message_);
                     },
                     [this](td_api::updateChatTitle &update_chat_title) 
                     {
