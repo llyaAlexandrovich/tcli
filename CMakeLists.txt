@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 
+include(FetchContent)
+
 
 # Default values.
 set(TCLI_VERSION "1.0.0")           # Set program version.
@@ -31,13 +33,26 @@ link_directories(/lib)
 
 
 
+# Fetchs.
+FetchContent_Declare(ftxui
+    GIT_REPOSITORY https://github.com/ArthurSonzogni/ftxui
+    GIT_TAG v6.1.9
+)
+FetchContent_MakeAvailable(ftxui)
+
+
 # Add default target.
-add_executable(tcli main.cpp)
+add_executable(TCli main.cpp)
 
 
 
 # Linking.
-target_link_libraries(tcli PRIVATE libcrypto.lib)
-target_link_libraries(tcli PRIVATE libfmt.a)
-target_link_libraries(tcli PRIVATE libspdlog.a)
-target_link_libraries(YourTarget PRIVATE Td::TdStatic)
+target_link_libraries(TCli PRIVATE libcrypto.lib)
+target_link_libraries(TCli PRIVATE libfmt.a)
+target_link_libraries(TCli PRIVATE libspdlog.a)
+target_link_libraries(TCli PRIVATE Td::TdStatic)
+target_link_libraries(TCli PRIVATE 
+    ftxui::component
+    ftxui::dom
+    ftxui::screen
+)
