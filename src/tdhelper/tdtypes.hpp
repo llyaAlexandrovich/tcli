@@ -51,6 +51,4 @@ using TdObject = td_api::object_ptr<td_api::Object>;
 
 // Consts.
 // Max length of the full name to show as a preview.
-#define MAX_FULL_NAME_LENGTH 10
-
-
+#define MAX_FULL_NAME_LENGTH 15
