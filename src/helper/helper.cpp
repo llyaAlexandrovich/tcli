@@ -42,3 +42,13 @@
     StringVersion.erase(0, StringVersion.find('.'));
     return std::stoi(StringVersion);
 }
+
+
+[[nodiscard]] bool ValidateLanguageCode(std::string& locale) noexcept
+{
+    // Only 2 languages has support for now.
+    // ISO 639-1 language codes.
+    if(locale == "ru") return true;
+    else if(locale == "en") return true;
+    else return false;
+}

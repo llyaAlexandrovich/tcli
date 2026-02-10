@@ -68,3 +68,18 @@
  * @since 1.0.0
  */
 [[nodiscard]] int GetPatchVersion(std::string StringVersion) noexcept;
+
+
+
+/**
+ * Validate language-code typically given by the user to the **argv.
+ * 
+ * @author Ilya Alexandrovich
+ * 
+ * @param locale  user-provided language code to verify
+ * 
+ * @return return whether true if locale exists or false
+ * 
+ * @since 1.0.0
+ */
+[[nodiscard]] bool ValidateLanguageCode(std::string& locale) noexcept;
