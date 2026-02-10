@@ -15,6 +15,9 @@
 
 #include "helper/helper.hpp"
 #include "localization/localization.hpp"
+
+
+#include "render/ui/ui_render.hpp"
 #include "render/text/text_render.hpp"
 
 
@@ -31,6 +34,7 @@
 #include <fcntl.h>
 
 
+#include "types.hpp"
 #include "tdhelper/tdtypes.hpp"
 
 
@@ -41,7 +45,7 @@
  * NONE => run program with the default settings
  * -H --help => show help page and exit
  * -U --user => specify the user for login
- * -L --locale => specify locale
+ * -L --language => specify language code
  * --proxy => specify proxy settings
  */
 int main(int argc, char **argv);
@@ -90,9 +94,6 @@ static bool const IsBeta = false;
 
 
 // User states.
-// User's system locale.
-static std::string _locale = "en"; // Default locale.
-
 // Directory to store data to.
 static std::string const DataDirectory = "tdata";
 
@@ -109,7 +110,6 @@ static std::string const DeviceModel = "Desktop";
 
 
 
-
 /**
  * Basic program class.
  * 
@@ -119,10 +119,11 @@ static std::string const DeviceModel = "Desktop";
 class tcli
 {
 public:
-    tcli()
+    tcli() :
+        UI()
     {
         td::ClientManager::execute(td_api::make_object<td_api::setLogVerbosityLevel>(1));
-        ClientManager = std::make_shared<td::ClientManager>();
+        ClientManager = std::make_unique<td::ClientManager>();
         ClientID = ClientManager->create_client_id();
         SendQuery(td_api::make_object<td_api::getOption>("version"), {});
     }
@@ -134,7 +135,7 @@ public:
         {
             if(bIsRestartRequired)
             {
-                restart();
+                Restart();
             }
             else if(!bIsAuthorized)
             {
@@ -143,6 +144,7 @@ public:
             else
             {
                 // Chat processor should be placed here.
+                // UI.Render();
             }
         }
     }
@@ -151,15 +153,18 @@ public:
 private:
     // ClientManager instance should be transfered to other
     // threads as well.
-    std::shared_ptr<td::ClientManager> ClientManager;
+    std::unique_ptr<td::ClientManager> ClientManager;
 
 
     // Current instance mutex to work with queue.
     std::mutex mutex;
 
 
-    // This type of initialization guarantee that value will be
-    // preinit with 0.
+    // UIrender class instance.
+    UIRender UI;
+
+
+    // TdLib identifier.
     std::int32_t ClientID{0};
 
 
@@ -243,7 +248,7 @@ private:
 
 
     // Restart current tcli instance. Not the whole app.
-    void restart()
+    void Restart()
     {
         ClientManager.reset();
         *this = tcli();
@@ -415,7 +420,7 @@ private:
                                     request->use_secret_chats_ = bSupportSecretChats;
                                     request->api_id_ = ApiID;
                                     request->api_hash_ = ApiHash;
-                                    request->system_language_code_ = _locale;
+                                    request->system_language_code_ = LanguageCode;
                                     request->device_model_ = DeviceModel;
                                     request->application_version_ = VersionAsString;
                                     SendQuery(std::move(request), CreateAuthQueryHandler());

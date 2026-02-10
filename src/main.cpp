@@ -9,10 +9,11 @@
 
 int main(int argc, char **argv)
 {   
+    // Set console mode to work with UTF-16.
     _setmode(_fileno(stdout), _O_U16TEXT);
 
 
-    std::string locale, user;
+    std::string language_code;
     for(int counter = 1; counter < argc; ++counter)
     {
         std::string_view token(argv[counter]);
@@ -32,15 +33,18 @@ int main(int argc, char **argv)
         //}
         else if(token == "-L" || token == "--locale")
         {
-            locale = argv[counter + 1];
+            language_code = argv[counter + 1];
             ++counter;
         }
     }
 
 
-    if(!locale.empty())
+    if(!language_code.empty())
     {
-        _locale = locale;
+        if(ValidateLanguageCode(language_code))
+        {
+            LanguageCode = language_code;
+        }
     }
 
 
