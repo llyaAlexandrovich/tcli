@@ -5,6 +5,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <functional>
 #include <string_view>
 #include <map>
 #include <memory>
@@ -13,7 +14,7 @@
 
 
 
-#include "../../localization/localization.hpp"
+#include "src/localization/localization.hpp"
 
 
 #include "td/telegram/Client.h"
@@ -21,20 +22,16 @@
 #include "td/telegram/td_api.hpp"
 
 
-
+#include "src/types.hpp"
 #include "tdhelper/tdtypes.hpp"
 
 
 
 
 
-/**
- * UI Renderer class.
- * 
- * @author Ilya Alexandrovich
- * 
- * 
- */
+
+
+
 class UIRender
 {
 public:
@@ -42,25 +39,18 @@ public:
     {
         GetScreenParams();
 
-        std::string locale = GetSystemLocaleWide();
-        if(!locale.empty())
-        {
-            _locale = locale;
-        }
-
         stream = std::wstringstream();
-        
-
 
         DrawDefaultScreen();
-
-        DrawMainContent();
     }
 
 
+    /**
+     * 
+     */
     void Render()
     {
-
+        
     }
 
 
@@ -69,10 +59,6 @@ private:
     // Screen parameters.
     short width{300};
     short height{150};
-
-
-    // Console locale.
-    std::string _locale{"en_US.UTF-8"};
 
 
     // Current console stream.
@@ -93,7 +79,7 @@ private:
      */
     void SetConsoleParams() noexcept
     {
-        stream.imbue(std::locale(_locale.data()));
+        stream.imbue(std::locale(LocaleIETF.data()));
     }
 
 
@@ -140,44 +126,6 @@ private:
         stream << "\x1b[104m"; // Set up blue color.
         for(short counter = 0; counter < width; ++counter) stream << ' ';
         stream << "\x1b[0m" << std::endl; // Reset color scheme.
-    }
-
-
-
-    /**
-     * Draw chat(main) content;
-     * 
-     * @author Ilya Alexandrovich
-     * 
-     * 
-     */
-    void DrawMainContent(td::tl_object_ptr<td_api::chats> chats, td::)
-    {
-
-    }
-
-
-
-    /**
-     * 
-     */
-    std::string_view ShowChatUnit(td_api::object_ptr<td_api::chat> chat, td_api::object_ptr<td_api::message> message, td_api::object_ptr<td_api::user> user)
-    {
-        std::wstring output;
-        td_api::downcast_call(*message->sender_id_,
-            overloaded(
-                [&](td_api::messageSenderUser& user)
-                {
-                    
-                },
-                [&](td_api::messageSenderChat& chat)
-                {
-                    output = GROUP_CHAT_PREFIX;
-                    
-                }
-        ));
-
-        output += converter.from_bytes(chat->title_.data());
     }
 
 
