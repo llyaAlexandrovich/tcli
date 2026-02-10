@@ -9,6 +9,9 @@
 
 
 
+
+
+
 #if defined _WIN32 || defined _WIN64
 #include <windows.h>
 #include <codecvt>
@@ -22,7 +25,7 @@
  * 
  * @since 1.0.0
  */
-std::string GetSystemLocale() noexcept
+[[nodiscard]] std::string GetSystemLocale() noexcept
 {
     std::wstring WinLocaleName;
 
@@ -50,7 +53,7 @@ std::string GetSystemLocale() noexcept
  * 
  * @since 1.0.0
  */
-std::string GetSystemLocaleWide() noexcept
+[[nodiscard]] std::string GetSystemLocaleWide() noexcept
 {
     std::wstring WinLocaleName;
 
@@ -80,7 +83,7 @@ std::string GetSystemLocaleWide() noexcept
  * 
  * @since 1.0.0
  */
-std::string GetSystemLocale() noexcept
+[[nodiscard]] std::string GetSystemLocale() noexcept
 {
     const char* LinuxLocaleName = std::setlocale(LC_ALL, "");
     if(LinuxLocaleName != nullptr)
@@ -103,7 +106,7 @@ std::string GetSystemLocale() noexcept
  * 
  * @since 1.0.0
  */
-std::string GetSystemLocaleWide() noexcept
+[[nodiscard]] std::string GetSystemLocaleWide() noexcept
 {
     const char* LinuxLocaleName = std::setlocale(LC_ALL, "");
     if(LinuxLocaleName != nullptr)
