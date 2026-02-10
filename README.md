@@ -22,7 +22,6 @@
     - [ ] Keyboards
 - [ ] Useability
     - [ ] High-end audio for video and audio
-    - [ ] Character-based video and audio render
     - [ ] Interface simplicity
     - [ ] Interface stability
     - [ ] Overall stability
