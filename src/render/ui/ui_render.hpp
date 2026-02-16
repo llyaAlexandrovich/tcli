@@ -6,6 +6,7 @@
 #include <sstream>
 #include <string>
 #include <functional>
+#include <algorithm>
 #include <string_view>
 #include <map>
 #include <memory>
@@ -22,157 +23,78 @@
 #include "td/telegram/td_api.hpp"
 
 
+#include "ftxui/dom/elements.hpp"
+#include "ftxui/component/component.hpp"
+#include "ftxui/component/screen_interactive.hpp"
+#include "ftxui/screen/screen.hpp"
+
+
 #include "src/types.hpp"
 #include "tdhelper/tdtypes.hpp"
 
 
+#include "place_holders.hpp"
+#include "status_bar.hpp"
 
 
 
 
 
 
-class UIRender
+
+class UIRender : PlaceHolder : StatusBar : Chat
 {
 public:
-    UIRender()
+    UIRender() : StatusBar()
     {
-        GetScreenParams();
-
-        stream = std::wstringstream();
-
-        DrawDefaultScreen();
-    }
-
-
-    /**
-     * 
-     */
-    void Render()
-    {
-        
+        Screen = ftxui::ScreenInteractive::FullScreen();
     }
 
 
 
 private:
-    // Screen parameters.
-    short width{300};
-    short height{150};
+    // Screen.
+    ftxui::ScreenInteractive Screen;
 
 
-    // Current console stream.
-    std::wstringstream stream;
+    // Chat.
+    ftxui::Component BlankChat = ftxui::Renderer([&]{
+        return ftxui::text(ChatPlaceHolder) | ftxui::center;
+    });
+    ftxui::Component Chat = BlankChat;
 
 
-    // Codecvt object: string => wstring
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+    // Input content.
+    std::string InputContent;
+    
+
+    // Input options.
+    ftxui::InputOption InputOptions = ftxui::InputOption::Spacious();
+    InputOptions.content = &InputContent;
+    InputOptions.placeholder = InputPlaceHolder;
+
+    // Input transform.
+    InputOptions.transform = [&](ftxui::InputState InputState){
+        if(InputState.focused) return InputState.element = ftxui::text(InputContent);
+        return InputState.element = ftxui::text(InputPlaceHolder);
+    };
+
+    // Input.
+    bool ShowInput = false;
+    ftxui::Component Input = ftxui::Maybe(ftxui::Input(InputOptions) | ftxui::border, &ShowInput);
 
 
+    // Chat selector.
+    int SelectedChat{0};
 
-    /**
-     * Set parameters for the current console.
-     * 
-     * @author Ilya Alexandrovich
-     * 
-     * @since 1.0.0
-     */
-    void SetConsoleParams() noexcept
-    {
-        stream.imbue(std::locale(LocaleIETF.data()));
-    }
-
-
-
-    /**
-     * Make the screen blank.
-     * 
-     * @author Ilya Alexandrovich
-     * 
-     * @since 1.0.0
-     */
-    void ClearScreen() noexcept
-    {
-        stream.flush();
-    }
-
-
-
-    /**
-     * Draw default screen.
-     * 
-     * @author Ilya Alexandrovch
-     * 
-     * @since 1.0.0
-     */
-    void DrawDefaultScreen()
-    {
-        ClearScreen();
-        DrawBorders();
-    }
-
-
-
-    /**
-     * Draw borders.
-     * 
-     * @author Ilya Alexandrovich
-     * 
-     * @since 1.0.0
-     */
-    void DrawBorders()
-    {
-        // Above border.
-        stream << "\x1b[104m"; // Set up blue color.
-        for(short counter = 0; counter < width; ++counter) stream << ' ';
-        stream << "\x1b[0m" << std::endl; // Reset color scheme.
-    }
-
-
-
-#if defined _WIN32 || defined _WIN64 // Windows.
-#include <windows.h>
-
-    /**
-     * Get parametrs of the current console screen.
-     * 
-     * @author Ilya Alexandrovich
-     * 
-     * @since 1.0.0
-     */
-    void GetScreenParams() noexcept
-    {
-        CONSOLE_SCREEN_BUFFER_INFO csbi;
-        if(GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi))
-        {
-            width = csbi.srWindow.Right - csbi.srWindow.Left + 1;
-            height = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+    ftxui::MenuOption ChatSelectorOptions{
+        .on_enter = [&]{
+            ShowInput = true;
+            Chat = ftxui::Renderer([&]{
+                // Chat rendering should be here.
+            });
         }
-    }
+    };
 
-
-#else // Linux and others.
-#include <sys/ioctl.h>
-#include <unistd.h>
-
-    /**
-     * Get parametrs of the current console screen.
-     * 
-     * @author Ilya Alexandrovich
-     * 
-     * @since 1.0.0
-     */
-    void GetScreenParams() noexcept
-    {
-        struct winsize w;
-        if(!ioctl(STDOUT_FILENO, TIOCGWINSZ, &w)))
-        {
-            width = w.ws_col;
-            height = w.ws_row;
-        }
-    }
-
-
-#endif // Linux and others.
-
+    ftxui::Component ChatSelector = ftxui::Menu() | ftxui::frame | ftxui::vscroll_indicator;
 };
