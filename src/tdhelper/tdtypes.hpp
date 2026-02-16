@@ -40,7 +40,10 @@ auto overloaded(F... f) {
 // Helpers.
 namespace td_api = td::td_api;
 
+
 using TdObject = td_api::object_ptr<td_api::Object>;
+using TdSendQuery = std::function<void(td_api::object_ptr<td_api::Function>, std::function<void(TdObject)>)>;
+using TdAuthorizationState = td_api::object_ptr<td_api::AuthorizationState>;
 
 
 // Prefixes.
@@ -52,3 +55,7 @@ using TdObject = td_api::object_ptr<td_api::Object>;
 // Consts.
 // Max length of the full name to show as a preview.
 #define MAX_FULL_NAME_LENGTH 15
+
+
+// Max number of chat to load at once.
+#define CHATS_TO_LOAD 20
