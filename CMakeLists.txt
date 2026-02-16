@@ -47,9 +47,6 @@ add_executable(TCli main.cpp)
 
 
 # Linking.
-target_link_libraries(TCli PRIVATE libcrypto.lib)
-target_link_libraries(TCli PRIVATE libfmt.a)
-target_link_libraries(TCli PRIVATE libspdlog.a)
 target_link_libraries(TCli PRIVATE Td::TdStatic)
 target_link_libraries(TCli PRIVATE 
     ftxui::component
