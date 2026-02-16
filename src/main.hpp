@@ -21,21 +21,16 @@
 #include "render/text/text_render.hpp"
 
 
-#include "spdlog/spdlog.h"
-#include "spdlog/sinks/rotating_file_sink.h"
-
-
 #include "td/telegram/Client.h"
 #include "td/telegram/td_api.h"
 #include "td/telegram/td_api.hpp"
 
 
-#include <io.h>
-#include <fcntl.h>
-
-
 #include "types.hpp"
 #include "tdhelper/tdtypes.hpp"
+
+
+#define CHAT_LIST_LENGTH 20
 
 
 
@@ -72,14 +67,6 @@ static double const TimeOut = 10.0;
 
 // Help page content.
 static std::wstring const HelpPageText = std::format("TCli v{} by Ilya Alexandrovich", VersionAsString);
-
-
-// This number represents 10MB using Mib IEC system(2^20 * 10).
-static int const MaxLoggerFileSize = 10485760;
-
-
-// This number represents the maximum number of log files.
-static int const MaxNumberOfLoggerFiles = 1;
 
 
 // Indicates whether beta version is installed.
@@ -190,7 +177,7 @@ private:
     std::map<std::uint64_t, std::function<void(TdObject)>> handlers;
 
     // Name of the chats users.
-    std::map<std::int64_t, td_api::object_ptr<td_api::user>> users;
+    std::map<std::int64_t, td_api::object_ptr<td_api::user>> Users;
 
     // Names of the chats.
     std::map<std::int64_t, std::string> ChatTitle;
@@ -199,7 +186,7 @@ private:
     std::map<std::int64_t, td_api::object_ptr<td_api::message>> ChatLastMessage;
 
     // Chat position by chat id.
-    std::vector<std::int64_t> ChatPosition;
+    std::vector<std::int64_t> ChatPosition(CHAT_LIST_LENGTH);
 
 
 
@@ -213,8 +200,8 @@ private:
     // Get user name by the user ID.
     [[nodiscard]] std::string GetUserName(std::int64_t UserID) const
     {
-        auto it = users.find(UserID);
-        if(it == users.end())
+        auto it = Users.find(UserID);
+        if(it == Users.end())
         {
             return "Unknown user";
         }
@@ -313,7 +300,7 @@ private:
                     [this](td_api::updateUser &update_user) 
                     {
                         auto user_id = update_user.user_->id_;
-                        users[user_id] = std::move(update_user.user_);
+                        Users[user_id] = std::move(update_user.user_);
                     },
                     [this](td_api::updateNewMessage &update_new_message)
                     {
@@ -337,6 +324,10 @@ private:
                         std::cout << "Receive message: [chat_id:" << chat_id << "] [from:" << sender_name << "] ["
                                     << text << "]" << std::endl;
                     },
+                    [this](td_api::updateChatLastMessage& message)
+                    {
+
+                    }
                     [](auto &update) {}));
     }
 

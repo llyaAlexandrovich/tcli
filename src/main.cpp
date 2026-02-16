@@ -10,7 +10,7 @@
 int main(int argc, char **argv)
 {   
     // Set console mode to work with UTF-16.
-    _setmode(_fileno(stdout), _O_U16TEXT);
+    //_setmode(_fileno(stdout), _O_U16TEXT);
 
 
     std::string language_code;
