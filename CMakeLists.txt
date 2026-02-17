@@ -10,21 +10,18 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON) # Force to have required cxx version.
 
 
 
+# Add default target.
+add_executable(TCli src/main.cpp)
+
+
+
 project(TCli VERSION ${TCLI_VERSION} LANGUAGES CXX) # Project basis.
 
 
 
-# Subdirectories.
-add_subdirectory(src)
-add_subdirectory(src/helper)
-add_subdirectory(src/render)
-add_subdirectory(src/localization)
-add_subdirectory(src/tdhelper)
-
-
-
 # Includes.
-include_directories(/include)
+target_include_directories(TCli PRIVATE include)
+target_include_directories(TCli PRIVATE src)
 
 
 
@@ -41,13 +38,9 @@ FetchContent_Declare(ftxui
 FetchContent_MakeAvailable(ftxui)
 
 
-# Add default target.
-add_executable(TCli main.cpp)
-
-
 
 # Linking.
-target_link_libraries(TCli PRIVATE Td::TdStatic)
+target_link_libraries(TCli PRIVATE tdcore.lib)
 target_link_libraries(TCli PRIVATE 
     ftxui::component
     ftxui::dom
