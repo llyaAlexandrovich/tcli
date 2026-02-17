@@ -20,34 +20,31 @@
 #include "tdhelper/tdtypes.hpp"
 
 
+#include "chats.hpp"
+#include "auth_updates.hpp"
 
 
-class TelegramUpdates
+
+
+
+/**
+ * There's quite a lot of updates in Telegram so i decided
+ * to manage all of them separately.
+ * 
+ * @author Ilya Alexandrovich
+ * 
+ * @since 1.0.0  
+ */
+template <typename T>
+class TelegramUpdates : TelegramAuthUpdates
 {
 public:
-    /**
-     * There's quite a lot of updates in Telegram so i decided
-     * to manage all of them separately.
-     * 
-     * @author Ilya Alexandrovich
-     * 
-     * @param bIsAuthorized  showing whether user is authorized or not
-     * @param bIsRestartRequired  showing whether restart is required or not
-     * @param Users  map of users
-     * @param Chats  map of chats
-     * 
-     * @since 1.0.0  
-     */
-    TelegramUpdates(
-        bool bIsAuthorized,
-        bool bIsRestartRequired,
-        std::unordered_map<std::int64_t, td_api::object_ptr<td_api::user>>& Users,
-        std::unordered_map<std::int64_t, td_api::object_ptr<td_api::chat>>& Chats)
-        :
-        bIsAuthorized(bIsAuthorized), bIsRestartRequired(bIsRestartRequired),\
-        Users(Users), Chats(Chats)
-    {
+    TelegramUpdates();
 
+
+    void InitTelegramUpdates()
+    {
+        TelegramCLI = static_cast<T*>(this);
     }
 
 
@@ -64,11 +61,9 @@ public:
     }
 
 private:
-    TdAuthorizationState AuthorizationState;
+    T* TelegramCLI;
 
-    bool& bIsAuthorized;
-    bool& bIsRestartRequired;
 
-    std::unordered_map<std::int64_t, td_api::object_ptr<td_api::user>>& Users;
-    std::unordered_map<std::int64_t, td_api::object_ptr<td_api::chat>>& Chats;
+
+
 };

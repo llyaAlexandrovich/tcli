@@ -22,11 +22,7 @@
 
 
 
-class TelegramQuery
+class TelegramUsers
 {
-public:
-    
-
-private:
 
 };
