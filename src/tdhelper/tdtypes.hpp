@@ -42,8 +42,8 @@ namespace td_api = td::td_api;
 
 
 using TdObject = td_api::object_ptr<td_api::Object>;
-using TdSendQuery = std::function<void(td_api::object_ptr<td_api::Function>, std::function<void(TdObject)>)>;
 using TdAuthorizationState = td_api::object_ptr<td_api::AuthorizationState>;
+
 
 
 // Prefixes.
@@ -59,3 +59,7 @@ using TdAuthorizationState = td_api::object_ptr<td_api::AuthorizationState>;
 
 // Max number of chat to load at once.
 #define CHATS_TO_LOAD 20
+
+
+// Default number of chats.
+#define CHAT_LIST_LENGTH 40
