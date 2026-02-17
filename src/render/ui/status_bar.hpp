@@ -21,19 +21,35 @@ class StatusBar
 public:
     StatusBar()
     {
-        StatusBar = ftxui::Renderer([&]{
+        StatusBarComponent = ftxui::Renderer([&]{
             return ftxui::text(Status) | ftxui::hcenter;
         });
     }
 
 
-    void UpdateStatus(std::string NewStatus)
+    enum class StatusType : int
     {
-        Status = NewStatus;
-    }
-    
-    ftxui::Component StatusBar;
+        Active = 1,
+        Loading
+    };
+
+
+    void UpdateStatus(StatusType Type)
+    {
+        switch(Type){
+            case StatusType::Active:
+                Status = StatusMainPlaceHolder;
+                return;
+            case StatusType::Loading:
+                Status = StatusLoadingPlaceHolder;
+                return;
+        }
+    } 
+
+    ftxui::Component StatusBarComponent;
 
 private:
     std::string Status;
+    std::string StatusMainPlaceHolder = "Telegram CLI";
+    std::string StatusLoadingPlaceHolder = "Loading...";
 };
