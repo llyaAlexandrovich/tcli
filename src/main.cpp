@@ -19,7 +19,7 @@ int main(int argc, char **argv)
         std::string_view token(argv[counter]);
         if(token == "-H" || token == "--help")
         {
-            std::wcout << HelpPageText << std::endl;
+            std::cout << HelpPageText << std::endl;
             return 0;
         }
         //else if(token == "-U" || token == "--user")
@@ -54,8 +54,8 @@ int main(int argc, char **argv)
     //}
 
 
-    tcli T;
-    T.run();
+    TelegramCLI T;
+    //T.run();
 
 
 
