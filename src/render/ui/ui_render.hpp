@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <string>
+#include <functional>
 
 
 #include "localization/localization.hpp"
@@ -24,48 +25,113 @@
 #include "tdhelper/tdtypes.hpp"
 
 
-#include "chat.hpp"
-#include "status_bar.hpp"
-#include "input.hpp"
+#include "auth_component.hpp"
 
 
 
 
 
 
-
-class UIRender : StatusBar, Chat, Input
+class UIRender : public AuthComponent
 {
 public:
-    UIRender()
+    enum class SceneType : int
     {
-        
+        None = 0,
+        Main,
+        AuthorizationByPhoneNumber,
+        AuthorizationByEmailAddress,
+        Blank
+    };
+
+
+
+    /**
+     * Render scene with the given type.
+     * 
+     * @author Ilya Alexandrovich
+     * 
+     * @param Type  scene type
+     * 
+     * @since 1.0.0
+     */
+    void RenderScene(SceneType Type, std::string& InputContent, bool& bisChangeRequired, std::string Content)
+    {
+        CurrentSceneType = Type;
+        switch(Type){
+            case SceneType::None:
+                break;
+            case SceneType::Main:
+                break;
+            case SceneType::AuthorizationByPhoneNumber:
+                {
+                    auto ActiveComponent = CreatePhoneAuthComponent(InputContent);
+                    std::thread UIThread([&]{
+                        Screen.Loop(ActiveComponent);
+                    });
+                }
+                break;
+            case SceneType::AuthorizationByEmailAddress:
+                {
+                    auto ActiveComponent = CreateEmailAuthComponent(InputContent);
+                    std::thread UIThread([&]{
+                        Screen.Loop(ActiveComponent);
+                    });
+                }
+                break;
+            case SceneType::Blank:
+                std::thread UIThread([&]{
+                    Screen.Loop(BlankComponent);
+                });
+                break;
+        };
     }
 
 
-    enum class SceneType : int
-    {
-        
-    };
 
-    void RenderScene()
+    /**
+     * If some scene won't exit themselves don't be ease on them.
+     * 
+     * @author Ilya Alexandrovich
+     * 
+     * @since 1.0.0
+     */
+    void ExitScene()
     {
+        Screen.Post([&] { Screen.Exit(); });
+    }
 
+
+
+    /**
+     * This funciton update current state and scene if exists.
+     * 
+     * @author Ilya Alexandrovich
+     * 
+     * @param Type  scene type
+     * @param SceneInputHandler  callback for when user done with input and press enter
+     * 
+     * @since 1.0.0
+     */
+    void UpdateScene(SceneType Type, std::function<bool()> SceneInputHandler)
+    {
+        if(CurrentSceneType != SceneType::None) ExitScene();
+        RenderScene(Type, SceneInputHandler);
     }
 
 
 
 private:
-    // Screen.
     ftxui::ScreenInteractive Screen = ftxui::ScreenInteractive::Fullscreen();
 
 
-    ftxui::MenuOption ChatSelectorOptions{
-        .on_enter = [&]{
-            ShowInput();
-            
-        }
-    };
+    SceneType CurrentSceneType = SceneType::None;
 
-    ftxui::Component ChatSelector = ftxui::Menu() | ftxui::frame | ftxui::vscroll_indicator;
+
+    ftxui::Component BlankComponent = ftxui::Renderer([]{
+        return ftxui::text("");
+    });
 };
+
+
+//ftxui::Component ChatSelector = ftxui::Menu() | ftxui::frame | ftxui::vscroll_indicator;

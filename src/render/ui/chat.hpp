@@ -27,11 +27,11 @@ class Chat
 public:
     Chat()
     {
-        BlankChatComponent = ftxui::Renderer([&]{
+        PlaceHolderChatComponent = ftxui::Renderer([&]{
             return ftxui::text(ChatPlaceHoleder) | ftxui::center;
         });
 
-        ChatComponent = BlankChatComponent;
+        ChatComponent = PlaceHolderChatComponent;
     }
 
 
@@ -74,12 +74,12 @@ public:
      */
     void ClearChatContent()
     {
-        ChatComponent = BlankChatComponent;
+        ChatComponent = PlaceHolderChatComponent;
     }
 
     ftxui::Component ChatComponent;
 
 private:
-    ftxui::Component BlankChatComponent;
+    ftxui::Component PlaceHolderChatComponent;
     std::string ChatPlaceHoleder = "Select a chat to start messaging";
 };
