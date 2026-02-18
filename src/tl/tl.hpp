@@ -57,7 +57,7 @@ static std::string const DeviceModel = "Desktop";
 
 
 
-class TelegramCLI : TelegramChats<TelegramCLI>, TelegramUpdates<TelegramCLI>
+class TelegramCLI : public TelegramChats<TelegramCLI>, public TelegramUpdates<TelegramCLI>
 {
 public:
     TelegramCLI()
