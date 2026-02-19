@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include <functional>
+#include <atomic>
 
 
 #include "localization/localization.hpp"
@@ -35,17 +36,6 @@
 class UIRender : public AuthComponent
 {
 public:
-    enum class SceneType : int
-    {
-        None = 0,
-        Main,
-        AuthorizationByPhoneNumber,
-        AuthorizationByEmailAddress,
-        Blank
-    };
-
-
-
     /**
      * Render scene with the given type.
      * 
@@ -57,6 +47,9 @@ public:
      */
     void RenderScene(SceneType Type, std::string& InputContent, bool& bisChangeRequired, std::string Content)
     {
+        Thread = std::thread([&]{
+                    Screen.Loop(BlankComponent);
+                });
         CurrentSceneType = Type;
         switch(Type){
             case SceneType::None:
@@ -90,6 +83,20 @@ public:
 
 
     /**
+     * Renders email auth page.
+     * 
+     * @author Ilya Alexandrovich
+     * 
+     * 
+     */
+    void RenderEmailAuthScene(std::string& InputContent, std::atomic<bool>& OnProcess)
+    {
+        
+    }
+
+
+
+    /**
      * If some scene won't exit themselves don't be ease on them.
      * 
      * @author Ilya Alexandrovich
@@ -102,35 +109,16 @@ public:
     }
 
 
-
-    /**
-     * This funciton update current state and scene if exists.
-     * 
-     * @author Ilya Alexandrovich
-     * 
-     * @param Type  scene type
-     * @param SceneInputHandler  callback for when user done with input and press enter
-     * 
-     * @since 1.0.0
-     */
-    void UpdateScene(SceneType Type, std::function<bool()> SceneInputHandler)
-    {
-        if(CurrentSceneType != SceneType::None) ExitScene();
-        RenderScene(Type, SceneInputHandler);
-    }
-
-
-
 private:
     ftxui::ScreenInteractive Screen = ftxui::ScreenInteractive::Fullscreen();
-
-
-    SceneType CurrentSceneType = SceneType::None;
 
 
     ftxui::Component BlankComponent = ftxui::Renderer([]{
         return ftxui::text("");
     });
+
+
+    std::thread Thread;
 };
 
 

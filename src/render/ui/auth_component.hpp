@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include <regex>
+#include <atomic>
 
 
 #include "td/telegram/Client.h"
@@ -21,7 +22,12 @@
 #include "tdhelper/tdtypes.hpp"
 
 
-
+/**
+ * For those who would ask why is there so many similar funcitons ->
+ * This file provides auth components and as long as different pages
+ * of authorization might be called different i would prefer using 
+ * different component for each and one of them.
+ */
 class AuthComponent
 {
 public:
@@ -31,12 +37,13 @@ public:
      * @author Ilya Alexandrovich
      * 
      * @param InputContent  variable to store the email address
+     * @param OnProcess  confirm button callback
      * 
      * @return return ready to use in Loop() call ftxui::Component
      * 
      * @since 1.0.0
      */
-    ftxui::Component CreateEmailAuthComponent(std::string& InputContent)
+    ftxui::Component CreateEmailAuthComponent(std::string& InputContent, std::atomic<bool>& OnProcess)
     {
         // Status component.
         std::string Status = "Telegram CLI";
@@ -79,9 +86,14 @@ public:
 
 
         // Confirm button component.
-        ftxui::Component ConfirmButton = ftxui::Button(AuthConfigButtonPlaceHolder, [&]{
+        ftxui::Component ConfirmButton = ftxui::Button(ConfirmButtonPlaceHolder, [&]{
             if(!std::regex_match(InputContent, EmailRegex)) bIsValidationFailed = true;
-            else Status = "Loading...";
+            else
+            {
+                Status = "Loading...";
+                DetailsContent = InputContent;
+                OnProcess.store(true, std::memory_order_release);
+            }
         }, ftxui::ButtonOption::Animated());
 
 
@@ -111,12 +123,13 @@ public:
      * @author Ilya Alexandrovich
      * 
      * @param InputContent  variable to store the email address
+     * @param OnProcess  confirm button callback
      * 
      * @return return ready to use in Loop() call ftxui::Component
      * 
      * @since 1.0.0
      */
-    ftxui::Component CreatePhoneAuthComponent(std::string& InputContent)
+    ftxui::Component CreatePhoneAuthComponent(std::string& InputContent, std::atomic<bool>& OnProcess)
     {
         // Status component.
         std::string Status = "Telegram CLI";
@@ -159,9 +172,14 @@ public:
 
 
         // Confirm button component.
-        ftxui::Component ConfirmButton = ftxui::Button(AuthConfigButtonPlaceHolder, [&]{
+        ftxui::Component ConfirmButton = ftxui::Button(ConfirmButtonPlaceHolder, [&]{
             if(!std::regex_match(InputContent, PhoneRegex)) bIsValidationFailed = true;
-            else Status = "Loading...";
+            else
+            {
+                Status = "Loading...";
+                DetailsContent = InputContent;
+                OnProcess.store(true, std::memory_order_release);
+            }
         }, ftxui::ButtonOption::Animated());
 
 
@@ -191,14 +209,14 @@ public:
      * @author Ilya Alexandrovich
      * 
      * @param InputContent  variable to store the code
-     * @param bIsEmailChangeRequired  indicates whether user request to change email
-     * @param EmailContent  email itself
+     * @param OnProcess  confirm button callback
+     * @param OnDetailsChange  details change request callback
      * 
      * @return return 'enter code from email' ftxui::Component
      * 
      * @since 1.0.0
      */
-    ftxui::Component CreateEmailAuthCodeComponent(std::string& InputContent, bool& bIsEmailChangeRequired, std::string EmailContent)
+    ftxui::Component CreateEmailAuthCodeComponent(std::string& InputContent, std::atomic<bool>& OnProcess, std::atomic<bool>& OnDetailsChange)
     {
         // Status component.
         std::string Status = "Telegram CLI";
@@ -211,7 +229,7 @@ public:
 
         // PlaceHolder component.
         ftxui::Component PlaceHolderComponent = ftxui::Renderer([&]{
-            return ftxui::paragraphAlignCenter(EmailAuthCodePlaceHolder + ": " + EmailContent);
+            return ftxui::paragraphAlignCenter(EmailAuthCodePlaceHolder + ": " + DetailsContent);
         });
 
 
@@ -227,8 +245,7 @@ public:
         // First attempt failed component.
         bool bIsFirstAttemptfailed = false;
         ftxui::Component ChangeButton = ftxui::Maybe(ftxui::Button(AuthChangeNumberButtonPlaceHolder, [&]{
-            bIsEmailChangeRequired = true;
-            return;
+            OnDetailsChange.store(true, std::memory_order_release);
         }, ftxui::ButtonOption::Animated()) | ftxui::hcenter, &bIsFirstAttemptfailed);
 
 
@@ -249,13 +266,17 @@ public:
 
 
         // Confirm button component.
-        ftxui::Component ConfirmButton = ftxui::Button(AuthConfigButtonPlaceHolder, [&]{
+        ftxui::Component ConfirmButton = ftxui::Button(ConfirmButtonPlaceHolder, [&]{
             if(InputContent.length() != AuthCodeLength)
             {
                 bIsValidationFailed = true;
                 bIsFirstAttemptfailed = true;
             }
-            else Status = "Loading...";
+            else
+            {
+                Status = "Loading...";
+                OnProcess.store(true, std::memory_order_release);
+            }
         }, ftxui::ButtonOption::Animated());
 
 
@@ -286,14 +307,14 @@ public:
      * @author Ilya Alexandrovich
      * 
      * @param InputContent  variable to store the code
-     * @param bIsEmailChangeRequired  indicates whether user request to change email
-     * @param PhoneContent  phone itself
+     * @param OnProcess  confirm button callback
+     * @param OnDetailsChange  details change request callback
      * 
      * @return return 'enter code from message' ftxui::Component
      * 
      * @since 1.0.0
      */
-    ftxui::Component CreatePhoneAuthCodeComponent(std::string& InputContent, bool& bIsPhoneChangeRequired, std::string PhoneContent)
+    ftxui::Component CreatePhoneAuthCodeComponent(std::string& InputContent, std::atomic<bool>& OnProcess, std::atomic<bool>& OnDetailsChange)
     {
         // Status component.
         std::string Status = "Telegram CLI";
@@ -306,7 +327,7 @@ public:
 
         // PlaceHolder component.
         ftxui::Component PlaceHolderComponent = ftxui::Renderer([&]{
-            return ftxui::paragraphAlignCenter(PhoneAuthCodePlaceHolder + ": " + PhoneContent);
+            return ftxui::paragraphAlignCenter(PhoneAuthCodePlaceHolder + ": " + DetailsContent);
         });
 
 
@@ -322,8 +343,7 @@ public:
         // First attempt failed component.
         bool bIsFirstAttemptfailed = false;
         ftxui::Component ChangeButton = ftxui::Maybe(ftxui::Button(AuthChangeNumberButtonPlaceHolder, [&]{
-            bIsPhoneChangeRequired = true;
-            return;
+            OnDetailsChange.store(true, std::memory_order_release);
         }, ftxui::ButtonOption::Animated()) | ftxui::hcenter, &bIsFirstAttemptfailed);
 
 
@@ -344,13 +364,17 @@ public:
 
 
         // Confirm button component.
-        ftxui::Component ConfirmButton = ftxui::Button(AuthConfigButtonPlaceHolder, [&]{
+        ftxui::Component ConfirmButton = ftxui::Button(ConfirmButtonPlaceHolder, [&]{
             if(InputContent.length() != AuthCodeLength)
             {
                 bIsValidationFailed = true;
                 bIsFirstAttemptfailed = true;
             }
-            else Status = "Loading...";
+            else
+            {
+                Status = "Loading...";
+                OnProcess.store(true, std::memory_order_release);
+            }
         }, ftxui::ButtonOption::Animated());
 
 
@@ -381,14 +405,14 @@ public:
      * @author Ilya Alexandrovich
      * 
      * @param InputContent variable to store the code
-     * @param bIsEmailChangeRequired  indicates whether user request to change email
-     * @param EmailContent  email itself
+     * @param OnProcess  confirm button callback
+     * @param OnDetailsChange  details change request callback
      * 
      * @return return 'email code invalid try again' ftxui::Component
      * 
      * @since 1.0.0
      */
-    ftxui::Component CreateEmailAuthCodeFailedComponent(std::string& InputContent, bool& bIsEmailChangeRequired, std::string EmailContent)
+    ftxui::Component CreateEmailAuthCodeFailedComponent(std::string& InputContent, std::atomic<bool>& OnProcess, std::atomic<bool>& OnDetailsChange)
     {
         // Status component.
         std::string Status = "Telegram CLI";
@@ -401,7 +425,7 @@ public:
 
         // PlaceHolder component.
         ftxui::Component PlaceHolderComponent = ftxui::Renderer([&]{
-            return ftxui::paragraphAlignCenter(EmailAuthCodePlaceHolder + ": " + EmailContent);
+            return ftxui::paragraphAlignCenter(EmailAuthCodePlaceHolder + ": " + DetailsContent);
         });
 
 
@@ -417,8 +441,7 @@ public:
         // First attempt failed component.
         bool bIsFirstAttemptfailed = false;
         ftxui::Component ChangeButton = ftxui::Maybe(ftxui::Button(AuthChangeNumberButtonPlaceHolder, [&]{
-            bIsEmailChangeRequired = true;
-            return;
+            OnDetailsChange.store(true, std::memory_order_release);
         }, ftxui::ButtonOption::Animated()) | ftxui::hcenter, &bIsFirstAttemptfailed);
 
 
@@ -439,13 +462,17 @@ public:
 
 
         // Confirm button component.
-        ftxui::Component ConfirmButton = ftxui::Button(AuthConfigButtonPlaceHolder, [&]{
+        ftxui::Component ConfirmButton = ftxui::Button(ConfirmButtonPlaceHolder, [&]{
             if(InputContent.length() != AuthCodeLength)
             {
                 bIsValidationFailed = true;
                 bIsFirstAttemptfailed = true;
             }
-            else Status = "Loading...";
+            else
+            {
+                Status = "Loading...";
+                OnProcess.store(true, std::memory_order_release);
+            }
         }, ftxui::ButtonOption::Animated());
 
 
@@ -476,14 +503,14 @@ public:
      * @author Ilya Alexandrovich
      * 
      * @param InputContent variable to store the code
-     * @param bIsPhoneChangeRequired  indicates whether user request to change email
-     * @param PhoneContent  email itself
+     * @param OnProcess  confirm button callback
+     * @param OnDetailsChange  details change request callback
      * 
      * @return return 'phone code invalid try again' ftxui::Component
      * 
      * @since 1.0.0
      */
-    ftxui::Component CreateEmailAuthCodeFailedComponent(std::string& InputContent, bool& bIsPhoneChangeRequired, std::string PhoneContent)
+    ftxui::Component CreatePhoneAuthCodeFailedComponent(std::string& InputContent, std::atomic<bool>& OnProcess, std::atomic<bool>& OnDetailsChange)
     {
         // Status component.
         std::string Status = "Telegram CLI";
@@ -496,7 +523,7 @@ public:
 
         // PlaceHolder component.
         ftxui::Component PlaceHolderComponent = ftxui::Renderer([&]{
-            return ftxui::paragraphAlignCenter(PhoneAuthCodePlaceHolder + ": " + PhoneContent);
+            return ftxui::paragraphAlignCenter(PhoneAuthCodePlaceHolder + ": " + DetailsContent);
         });
 
 
@@ -512,8 +539,7 @@ public:
         // First attempt failed component.
         bool bIsFirstAttemptfailed = false;
         ftxui::Component ChangeButton = ftxui::Maybe(ftxui::Button(AuthChangeNumberButtonPlaceHolder, [&]{
-            bIsPhoneChangeRequired = true;
-            return;
+            OnDetailsChange.store(true, std::memory_order_release);
         }, ftxui::ButtonOption::Animated()) | ftxui::hcenter, &bIsFirstAttemptfailed);
 
 
@@ -534,9 +560,110 @@ public:
 
 
         // Configrm button component.
-        ftxui::Component ConfirmButton = ftxui::Button(AuthConfigButtonPlaceHolder, [&]{
+        ftxui::Component ConfirmButton = ftxui::Button(ConfirmButtonPlaceHolder, [&]{
             if(InputContent.length() != AuthCodeLength) bIsValidationFailed = true;
-            else Status = "Loading...";
+            else
+            {
+                Status = "Loading...";
+                OnProcess.store(true, std::memory_order_release);
+            }
+        }, ftxui::ButtonOption::Animated());
+
+
+        // Maternity.
+        ftxui::Component EmailBox = ftxui::Container::Vertical({
+            PlaceHolderComponent,
+            ValidationFailedText | ftxui::borderEmpty,
+            Input | ftxui::border | ftxui::hcenter,
+            ConfirmButton | ftxui::borderEmpty | ftxui::hcenter,
+        }) | ftxui::border | ftxui::size(ftxui::WIDTH, ftxui::EQUAL, 32) | ftxui::size(ftxui::HEIGHT, ftxui::EQUAL, 15);
+
+
+        ftxui::Component MainContent = ftxui::Container::Vertical({
+            StatusBar,
+            EmailBox,
+            ChangeButton
+        }) | ftxui::center;
+
+
+        return MainContent;
+    }
+
+
+
+    /**
+     * Returns 'enter password' component
+     * 
+     * @author Ilya Alexandrovich
+     * 
+     * @param InputContent  variable to store the password
+     * @param OnProcess  confirm button callback
+     * 
+     * @return return 'enter your password' component
+     * 
+     * @since 1.0.0
+     */
+    ftxui::Component CreatePasswordComponent(std::string& InputContent, std::atomic<bool>& OnProcess)
+    {
+        // Status component.
+        std::string Status = "Telegram CLI";
+        ftxui::Component StatusBar = ftxui::Renderer([&]
+            {
+                return ftxui::text(Status) | ftxui::hcenter;
+            }
+        );
+
+
+        // PlaceHolder component.
+        ftxui::Component PlaceHolderComponent = ftxui::Renderer([&]{
+            return ftxui::paragraphAlignCenter(PasswordAuthPlaceHolder);
+        });
+
+
+        // Validation failed component.
+        bool bIsValidationFailed = true;
+        std::string ValidationInvalidReason = PasswordAuthValidationFailedPlaceHolder;
+        ftxui::Component ValidationFailedText = ftxui::Maybe(ftxui::Renderer([&]
+            {
+                return ftxui::text(ValidationInvalidReason) | ftxui::hcenter;
+            }), &bIsValidationFailed
+        );
+
+
+        // Input component.
+        ftxui::InputOption InputOptions = ftxui::InputOption::Spacious();
+        InputOptions.content = InputContent;
+        InputOptions.placeholder = PasswordAuthInputPlaceHolder;
+        InputOptions.transform = [&](ftxui::InputState State){
+            if(State.focused && !InputContent.empty())
+            {
+                bIsValidationFailed = false;
+                InputOptions.placeholder = PasswordAuthInputPlaceHolder;
+                return State.element = ftxui::text(InputContent);
+            }
+            else if(!InputContent.empty()) return State.element = ftxui::text(InputContent);
+            return State.element = ftxui::text(PasswordAuthInputPlaceHolder);
+        };
+        ftxui::Component Input = ftxui::Input(InputOptions);
+
+
+        // Configrm button component.
+        ftxui::Component ConfirmButton = ftxui::Button(ConfirmButtonPlaceHolder, [&]{
+            if(InputContent.length() < MinPasswordLength)
+            {
+                ValidationInvalidReason = PasswordIsTooSmallPlaceHolder;
+                bIsValidationFailed = true;
+            }
+            else if(InputContent.length() > MinPasswordLength)
+            {
+                ValidationInvalidReason = PasswordIsTooLongPlaceHolder;
+                bIsValidationFailed = true;
+            }
+            else
+            {
+                Status = "Loading...";
+                OnProcess.store(true, std::memory_order_release);
+            }
         }, ftxui::ButtonOption::Animated());
 
 
@@ -558,28 +685,33 @@ public:
         return MainContent;
     }
 
-
+    
 private:
     // Placeholders.
     std::string EmailAuthPlaceHolder = "Please enter email connected to this Telegram account";
     std::string EmailAuthCodePlaceHolder = "Please enter the code sended to your email";
     std::string PhoneAuthPlaceHolder = "Please enter phone number connected to this Telegram account";
     std::string PhoneAuthCodePlaceHolder = "Please enter the code sended to your phone number";
+    std::string PasswordAuthPlaceHolder = "Please enter your cloud password";
 
 
     std::string EmailAuthInputPlaceHolder = "Enter your email here";
     std::string PhoneAuthInputPlaceHolder = "Enter your phone number here";
     std::string AuthCodeInputPlaceHolder = "Enter your code here";
+    std::string PasswordAuthInputPlaceHolder = "Enter your password here";
 
 
     std::string EmailAuthValidationFailedPlaceHolder = "Incorrect email";
     std::string PhoneAuthValidationFailedPlaceHolder = "Incorrect phone number";
     std::string AuthCodeValidationFailedPlaceHolder = "Invalid code";
+    std::string PasswordAuthValidationFailedPlaceHolder = "Incorrect password";
+    std::string PasswordIsTooSmallPlaceHolder = "Password is too small";
+    std::string PasswordIsTooLongPlaceHolder = "Password is too long";
 
 
     std::string AuthChangeNumberButtonPlaceHolder = "Change number";
     std::string AuthChangeEmailButtonPlaceHolder = "Change email";
-    std::string AuthConfigButtonPlaceHolder = "Confirm";
+    std::string ConfirmButtonPlaceHolder = "Confirm";
 
 
     std::regex EmailRegex{R"([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})"};
@@ -587,9 +719,15 @@ private:
 
 
     int const AuthCodeLength{5};
+    int const MaxPasswordLength{16};
+    int const MinPasswordLength{8};
+
+
+    // Whether phone or email itself.
+    std::string DetailsContent;
 };
 
 
 /**
- * !NOTE Theoretically I only need to add registration through QR codes support. It'll be hard to do though.
+ * !NOTE Theoretically I only need to add registration through QR codes support. It'll be hard to do though. I forget password.
  */
