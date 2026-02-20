@@ -29,7 +29,7 @@
 
 /**
  * There's quite a lot of updates in Telegram so i decided
- * to manage all of them separately.
+ * to manage them all separately.
  * 
  * @author Ilya Alexandrovich
  * 
@@ -48,6 +48,8 @@ public:
     }
 
 
+    // General updates
+
     /**
      * Process Telegram updates.
      * 
@@ -60,10 +62,10 @@ public:
 
     }
 
+
+    // Authorization updates.
+
+
 private:
     T* TelegramCLI;
-
-
-
-
 };

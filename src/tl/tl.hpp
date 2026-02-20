@@ -25,6 +25,9 @@
 #include "updates.hpp"
 
 
+#include "render/ui/ui_render.hpp"
+
+
 // Telegram related consts.
 
 // Telegram API ID.
@@ -57,7 +60,7 @@ static std::string const DeviceModel = "Desktop";
 
 
 
-class TelegramCLI : public TelegramChats<TelegramCLI>, public TelegramUpdates<TelegramCLI>
+class TelegramCLI : public TelegramChats<TelegramCLI>, public TelegramUpdates<TelegramCLI>, public UIRender
 {
 public:
     TelegramCLI()
@@ -76,6 +79,27 @@ public:
         InitTelegramUpdates();
 
         InitTelegramChats();
+    }
+
+
+    bool run()
+    {
+        while(true)
+        {
+            if(bIsRestartRequired)
+            {
+                return false;
+            }
+            else if(!bIsAuthorized)
+            {
+                ProcessResponse(ClientManager->receive(TimeOut));
+            }
+            else
+            {
+                // Chat processor should be placed here.
+                // UI.Render();
+            }
+        }
     }
 
 
@@ -99,13 +123,6 @@ private:
 
     std::vector<std::int64_t> ChatsOrder{CHAT_LIST_LENGTH};
 
-
-
-    void Restart()
-    {
-        ClientManager.reset();
-        *this = TelegramCLI();
-    }
 
 
     [[nodiscard]] std::uint64_t NextQueryID()
@@ -135,7 +152,7 @@ private:
 
 
     /**
-     * Process TdLib response.
+     * Process TdLib response(ClientManager->recieve()).
      * 
      * @param Response  TdLib response
      * 
@@ -160,4 +177,5 @@ private:
             Handlers.erase(it);
         }
     }
+
 }; // class TelegramCLI

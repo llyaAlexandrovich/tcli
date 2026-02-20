@@ -24,5 +24,9 @@
 
 class TelegramUsers
 {
+public:
+
+
+private:
 
 };

@@ -3,12 +3,6 @@
 
 
 #include <iostream>
-#include <string>
-#include <string_view>
-#include <vector>
-#include <unordered_map>
-#include <functional>
-#include <memory>
 
 
 #include "td/telegram/Client.h"
@@ -134,6 +128,32 @@ public:
                                 }));
     }
 
-private:
+
+    void CheckAuthenticationError(TdObject Object)
+    {
+        if(Object->get_id() == td_api::error::ID)
+        {
+            auto error = td::move_tl_object_as<td_api::error>(Object);
+            //std::cout << "Error " << to_string(error) << std::flush;
+            OnAuthStateUpdate();
+        }
+    }
+
+
+    auto CreateAuthenticationQueryHandler()
+    {
+        return [this, id = AuthQueryID](TdObject Object)
+        {
+            if(id == AuthQueryID)
+            {
+                CheckAuthenticationError(std::move(Object));
+            }
+        };
+    }
+
+    
     std::uint64_t AuthQueryID{0};
+
+private:
+
 };
