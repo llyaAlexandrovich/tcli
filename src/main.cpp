@@ -9,10 +9,6 @@
 
 int main(int argc, char **argv)
 {   
-    // Set console mode to work with UTF-16.
-    //_setmode(_fileno(stdout), _O_U16TEXT);
-
-
     std::string language_code;
     for(int counter = 1; counter < argc; ++counter)
     {
@@ -22,15 +18,6 @@ int main(int argc, char **argv)
             std::cout << HelpPageText << std::endl;
             return 0;
         }
-        //else if(token == "-U" || token == "--user")
-        //{
-        //    user = argv[counter + 1];
-        //    ++counter;
-        //}
-        //else if(token == "--proxy")
-        //{
-        //    ;
-        //}
         else if(token == "-L" || token == "--locale")
         {
             language_code = argv[counter + 1];
@@ -39,24 +26,15 @@ int main(int argc, char **argv)
     }
 
 
-    if(!language_code.empty())
+    while(true)
     {
-        if(ValidateLanguageCode(language_code))
+        std::unique_ptr<TelegramCLI> T = std::make_unique<TelegramCLI>();
+        if(!T->run())
         {
-            LanguageCode = language_code;
+            T = std::make_unique<TelegramCLI>();
         }
+        else break;
     }
-
-
-    //if(user.empty())
-    //{
-    //    ;
-    //}
-
-
-    TelegramCLI T;
-    //T.run();
-
 
 
     return 0;

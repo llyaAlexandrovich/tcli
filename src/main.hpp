@@ -11,16 +11,7 @@
 #include "localization/localization.hpp"
 
 
-#include "render/ui/ui_render.hpp"
-
-
-#include "td/telegram/Client.h"
-#include "td/telegram/td_api.h"
-#include "td/telegram/td_api.hpp"
-
-
 #include "types.hpp"
-#include "tdhelper/tdtypes.hpp"
 
 
 #include "tl/tl.hpp"
@@ -31,9 +22,7 @@
  * Recognizable arguments.
  * NONE => run program with the default settings
  * -H --help => show help page and exit
- * -U --user => specify the user for login
  * -L --language => specify language code
- * --proxy => specify proxy settings
  */
 int main(int argc, char **argv);
 
