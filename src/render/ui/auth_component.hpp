@@ -8,25 +8,20 @@
 #include <atomic>
 
 
-#include "td/telegram/Client.h"
-#include "td/telegram/td_api.h"
-#include "td/telegram/td_api.hpp"
-
-
 #include "ftxui/dom/elements.hpp"
 #include "ftxui/component/component.hpp"
 #include "ftxui/component/screen_interactive.hpp"
 #include "ftxui/screen/screen.hpp"
 
 
-#include "tdhelper/tdtypes.hpp"
+
 
 
 /**
  * For those who would ask why is there so many similar funcitons ->
  * This file provides auth components and as long as different pages
- * of authorization might be called different i would prefer using 
- * different component for each and one of them.
+ * of authorization might be called different I would prefer using 
+ * different components for each and one of them.
  */
 class AuthComponent
 {
@@ -211,12 +206,13 @@ public:
      * @param InputContent  variable to store the code
      * @param OnProcess  confirm button callback
      * @param OnDetailsChange  details change request callback
+     * @param ValidationFailedActive  set for the validation failed check
      * 
      * @return return 'enter code from email' ftxui::Component
      * 
      * @since 1.0.0
      */
-    ftxui::Component CreateEmailAuthCodeComponent(std::string& InputContent, std::atomic<bool>& OnProcess, std::atomic<bool>& OnDetailsChange)
+    ftxui::Component CreateEmailAuthCodeComponent(std::string& InputContent, std::atomic<bool>& OnProcess, std::atomic<bool>& OnDetailsChange, std::atomic<bool>& ValidationFailedActive)
     {
         // Status component.
         std::string Status = "Telegram CLI";
@@ -234,7 +230,7 @@ public:
 
 
         // Validation failed component.
-        bool bIsValidationFailed = false;
+        bool bIsValidationFailed = ValidationFailedActive;
         ftxui::Component ValidationFailedText = ftxui::Maybe(ftxui::Renderer([&]
             {
                 return ftxui::text(AuthCodeValidationFailedPlaceHolder) | ftxui::hcenter;
@@ -276,6 +272,14 @@ public:
             {
                 Status = "Loading...";
                 OnProcess.store(true, std::memory_order_release);
+                while(true)
+                {
+                    if(ValidationFailedActive.load(std::memory_order_acquire))
+                    {
+                        bIsValidationFailed = true;
+                        break;
+                    }
+                }
             }
         }, ftxui::ButtonOption::Animated());
 
@@ -309,12 +313,13 @@ public:
      * @param InputContent  variable to store the code
      * @param OnProcess  confirm button callback
      * @param OnDetailsChange  details change request callback
+     * @param ValidationFailedActive  set for the validation failed check
      * 
      * @return return 'enter code from message' ftxui::Component
      * 
      * @since 1.0.0
      */
-    ftxui::Component CreatePhoneAuthCodeComponent(std::string& InputContent, std::atomic<bool>& OnProcess, std::atomic<bool>& OnDetailsChange)
+    ftxui::Component CreatePhoneAuthCodeComponent(std::string& InputContent, std::atomic<bool>& OnProcess, std::atomic<bool>& OnDetailsChange, std::atomic<bool>& ValidationFailedActive)
     {
         // Status component.
         std::string Status = "Telegram CLI";
@@ -374,198 +379,14 @@ public:
             {
                 Status = "Loading...";
                 OnProcess.store(true, std::memory_order_release);
-            }
-        }, ftxui::ButtonOption::Animated());
-
-
-        // Maternity.
-        ftxui::Component EmailBox = ftxui::Container::Vertical({
-            PlaceHolderComponent,
-            ValidationFailedText | ftxui::borderEmpty,
-            Input | ftxui::border | ftxui::hcenter,
-            ConfirmButton | ftxui::borderEmpty | ftxui::hcenter,
-        }) | ftxui::border | ftxui::size(ftxui::WIDTH, ftxui::EQUAL, 32) | ftxui::size(ftxui::HEIGHT, ftxui::EQUAL, 15);
-
-
-        ftxui::Component MainContent = ftxui::Container::Vertical({
-            StatusBar,
-            EmailBox,
-            ChangeButton
-        }) | ftxui::center;
-
-
-        return MainContent;
-    }
-    
-
-
-    /**
-     * Returns 'email code invalid try againg' component
-     * 
-     * @author Ilya Alexandrovich
-     * 
-     * @param InputContent variable to store the code
-     * @param OnProcess  confirm button callback
-     * @param OnDetailsChange  details change request callback
-     * 
-     * @return return 'email code invalid try again' ftxui::Component
-     * 
-     * @since 1.0.0
-     */
-    ftxui::Component CreateEmailAuthCodeFailedComponent(std::string& InputContent, std::atomic<bool>& OnProcess, std::atomic<bool>& OnDetailsChange)
-    {
-        // Status component.
-        std::string Status = "Telegram CLI";
-        ftxui::Component StatusBar = ftxui::Renderer([&]
-            {
-                return ftxui::text(Status) | ftxui::hcenter;
-            }
-        );
-
-
-        // PlaceHolder component.
-        ftxui::Component PlaceHolderComponent = ftxui::Renderer([&]{
-            return ftxui::paragraphAlignCenter(EmailAuthCodePlaceHolder + ": " + DetailsContent);
-        });
-
-
-        // Validation failed component.
-        bool bIsValidationFailed = true;
-        ftxui::Component ValidationFailedText = ftxui::Maybe(ftxui::Renderer([&]
-            {
-                return ftxui::text(AuthCodeValidationFailedPlaceHolder) | ftxui::hcenter;
-            }), &bIsValidationFailed
-        );
-
-
-        // First attempt failed component.
-        bool bIsFirstAttemptfailed = false;
-        ftxui::Component ChangeButton = ftxui::Maybe(ftxui::Button(AuthChangeNumberButtonPlaceHolder, [&]{
-            OnDetailsChange.store(true, std::memory_order_release);
-        }, ftxui::ButtonOption::Animated()) | ftxui::hcenter, &bIsFirstAttemptfailed);
-
-
-        // Input component.
-        ftxui::InputOption InputOptions = ftxui::InputOption::Spacious();
-        InputOptions.content = InputContent;
-        InputOptions.placeholder = AuthCodeInputPlaceHolder;
-        InputOptions.transform = [&](ftxui::InputState State){
-            if(State.focused && !InputContent.empty())
-            {
-                bIsValidationFailed = false;
-                return State.element = ftxui::text(InputContent);
-            }
-            else if(!InputContent.empty()) return State.element = ftxui::text(InputContent);
-            return State.element = ftxui::text(AuthCodeInputPlaceHolder);
-        };
-        ftxui::Component Input = ftxui::Input(InputOptions);
-
-
-        // Confirm button component.
-        ftxui::Component ConfirmButton = ftxui::Button(ConfirmButtonPlaceHolder, [&]{
-            if(InputContent.length() != AuthCodeLength)
-            {
-                bIsValidationFailed = true;
-                bIsFirstAttemptfailed = true;
-            }
-            else
-            {
-                Status = "Loading...";
-                OnProcess.store(true, std::memory_order_release);
-            }
-        }, ftxui::ButtonOption::Animated());
-
-
-        // Maternity.
-        ftxui::Component EmailBox = ftxui::Container::Vertical({
-            PlaceHolderComponent,
-            ValidationFailedText | ftxui::borderEmpty,
-            Input | ftxui::border | ftxui::hcenter,
-            ConfirmButton | ftxui::borderEmpty | ftxui::hcenter,
-        }) | ftxui::border | ftxui::size(ftxui::WIDTH, ftxui::EQUAL, 32) | ftxui::size(ftxui::HEIGHT, ftxui::EQUAL, 15);
-
-
-        ftxui::Component MainContent = ftxui::Container::Vertical({
-            StatusBar,
-            EmailBox,
-            ChangeButton
-        }) | ftxui::center;
-
-
-        return MainContent;
-    }
-
-
-
-    /**
-     * Returns 'phone code invalid try againg' component
-     * 
-     * @author Ilya Alexandrovich
-     * 
-     * @param InputContent variable to store the code
-     * @param OnProcess  confirm button callback
-     * @param OnDetailsChange  details change request callback
-     * 
-     * @return return 'phone code invalid try again' ftxui::Component
-     * 
-     * @since 1.0.0
-     */
-    ftxui::Component CreatePhoneAuthCodeFailedComponent(std::string& InputContent, std::atomic<bool>& OnProcess, std::atomic<bool>& OnDetailsChange)
-    {
-        // Status component.
-        std::string Status = "Telegram CLI";
-        ftxui::Component StatusBar = ftxui::Renderer([&]
-            {
-                return ftxui::text(Status) | ftxui::hcenter;
-            }
-        );
-
-
-        // PlaceHolder component.
-        ftxui::Component PlaceHolderComponent = ftxui::Renderer([&]{
-            return ftxui::paragraphAlignCenter(PhoneAuthCodePlaceHolder + ": " + DetailsContent);
-        });
-
-
-        // Validation failed component.
-        bool bIsValidationFailed = true;
-        ftxui::Component ValidationFailedText = ftxui::Maybe(ftxui::Renderer([&]
-            {
-                return ftxui::text(AuthCodeValidationFailedPlaceHolder) | ftxui::hcenter;
-            }), &bIsValidationFailed
-        );
-
-
-        // First attempt failed component.
-        bool bIsFirstAttemptfailed = false;
-        ftxui::Component ChangeButton = ftxui::Maybe(ftxui::Button(AuthChangeNumberButtonPlaceHolder, [&]{
-            OnDetailsChange.store(true, std::memory_order_release);
-        }, ftxui::ButtonOption::Animated()) | ftxui::hcenter, &bIsFirstAttemptfailed);
-
-
-        // Input component.
-        ftxui::InputOption InputOptions = ftxui::InputOption::Spacious();
-        InputOptions.content = InputContent;
-        InputOptions.placeholder = AuthCodeInputPlaceHolder;
-        InputOptions.transform = [&](ftxui::InputState State){
-            if(State.focused && !InputContent.empty())
-            {
-                bIsValidationFailed = false;
-                return State.element = ftxui::text(InputContent);
-            }
-            else if(!InputContent.empty()) return State.element = ftxui::text(InputContent);
-            return State.element = ftxui::text(AuthCodeInputPlaceHolder);
-        };
-        ftxui::Component Input = ftxui::Input(InputOptions);
-
-
-        // Configrm button component.
-        ftxui::Component ConfirmButton = ftxui::Button(ConfirmButtonPlaceHolder, [&]{
-            if(InputContent.length() != AuthCodeLength) bIsValidationFailed = true;
-            else
-            {
-                Status = "Loading...";
-                OnProcess.store(true, std::memory_order_release);
+                while(true)
+                {
+                    if(ValidationFailedActive.load(std::memory_order_acquire))
+                    {
+                        bIsValidationFailed = true;
+                        break;
+                    }
+                }
             }
         }, ftxui::ButtonOption::Animated());
 
@@ -598,12 +419,13 @@ public:
      * 
      * @param InputContent  variable to store the password
      * @param OnProcess  confirm button callback
+     * @param ValidationFailedActive  set for the validation failed check
      * 
      * @return return 'enter your password' component
      * 
      * @since 1.0.0
      */
-    ftxui::Component CreatePasswordComponent(std::string& InputContent, std::atomic<bool>& OnProcess)
+    ftxui::Component CreatePasswordComponent(std::string& InputContent, std::atomic<bool>& OnProcess, std::atomic<bool>& ValidationFailedActive)
     {
         // Status component.
         std::string Status = "Telegram CLI";
@@ -663,6 +485,14 @@ public:
             {
                 Status = "Loading...";
                 OnProcess.store(true, std::memory_order_release);
+                while(true)
+                {
+                    if(ValidationFailedActive.load(std::memory_order_acquire))
+                    {
+                        bIsValidationFailed = true;
+                        break;
+                    }
+                }
             }
         }, ftxui::ButtonOption::Animated());
 
