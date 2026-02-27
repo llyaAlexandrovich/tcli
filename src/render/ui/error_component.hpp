@@ -34,7 +34,9 @@ public:
      */
     ftxui::Component CreateFloodWaitComponent(std::string FloodMessage, std::chrono::seconds& TimeOut)
     {
-        // Status component.
+        std::string FloodWaitPlaceHolder = "Flood Detected";
+
+
         std::string Status = "Telegram CLI";
         ftxui::Component StatusBar = ftxui::Renderer([&]
             {
@@ -43,13 +45,11 @@ public:
         );
 
 
-        // PlaceHolder component.
         ftxui::Component PlaceHolderComponent = ftxui::Renderer([&]{
             return ftxui::paragraphAlignCenter(FloodWaitPlaceHolder + ": " + FloodMessage);
         });
 
 
-        // Timer component.
         ftxui::Component Timer = ftxui::Renderer([&]
         {
             return ftxui::vbox(
@@ -58,8 +58,7 @@ public:
                 });
         });
 
-
-        // Maternity.
+        
         ftxui::Component FloodBox = ftxui::Container::Vertical(
         {
             PlaceHolderComponent,
@@ -73,10 +72,7 @@ public:
             FloodBox
         }) | ftxui::center | ftxui::focus;
         
+        
         return MainContent;
     }
-
-
-private:
-    std::string FloodWaitPlaceHolder = "Flood Detected";
 };
