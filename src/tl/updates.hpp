@@ -4,11 +4,12 @@
 
 #include <iostream>
 #include <string>
-#include <string_view>
 #include <vector>
 #include <unordered_map>
-#include <functional>
+#include <atomic>
 #include <memory>
+#include <thread>
+#include <chrono>
 
 
 #include "td/telegram/Client.h"
@@ -21,7 +22,7 @@
 
 
 #include "chats.hpp"
-#include "auth_updates.hpp"
+
 
 
 
@@ -36,7 +37,7 @@
  * @since 1.0.0  
  */
 template <typename T>
-class TelegramUpdates : TelegramAuthUpdates
+class TelegramUpdates
 {
 public:
     TelegramUpdates();
@@ -63,7 +64,6 @@ public:
     }
 
 
-    // Authorization updates.
 
 
 private:

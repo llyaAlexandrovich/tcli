@@ -37,6 +37,7 @@ auto overloaded(F... f) {
 // ...Type Dispatching.
 
 
+
 // Helpers.
 namespace td_api = td::td_api;
 
@@ -45,11 +46,7 @@ using TdObject = td_api::object_ptr<td_api::Object>;
 using TdAuthorizationState = td_api::object_ptr<td_api::AuthorizationState>;
 
 
-
-// Prefixes.
-// Prefix for chat name.
-#define GROUP_CHAT_PREFIX L"✤"
-
+using TdErrorT = td_api::error;
 
 
 // Consts.
@@ -63,3 +60,10 @@ using TdAuthorizationState = td_api::object_ptr<td_api::AuthorizationState>;
 
 // Default number of chats.
 #define CHAT_LIST_LENGTH 40
+
+
+
+// Errors.
+#define ERROR_FLOOD_WAIT 429
+
+#define ERROR_FLOOD 420

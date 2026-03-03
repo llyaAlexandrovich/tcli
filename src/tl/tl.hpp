@@ -22,6 +22,7 @@
 
 
 #include "chats.hpp"
+#include "auth_updates.hpp"
 #include "updates.hpp"
 
 
@@ -60,7 +61,7 @@ static std::string const DeviceModel = "Desktop";
 
 
 
-class TelegramCLI : public TelegramChats<TelegramCLI>, public TelegramUpdates<TelegramCLI>, public UIRender
+class TelegramCLI : public TelegramChats<TelegramCLI>, public TelegramUpdates<TelegramCLI>, public TelegramAuthUpdates<TelegramCLI>,  public UIRender
 {
 public:
     TelegramCLI()
@@ -106,6 +107,7 @@ public:
 private:
     friend class TelegramChats<TelegramCLI>;
     friend class TelegramUpdates<TelegramCLI>;
+    friend class TelegramAuthUpdates<TelegramCLI>;
 
     std::unique_ptr<td::ClientManager> ClientManager;
     std::int32_t ClientID{0};

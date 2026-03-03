@@ -16,51 +16,34 @@
 
 
 
+
+template <typename T>
 class TelegramAuthUpdates
 {
 public:
-    TdAuthorizationState AuthorizationState;
-
-    TelegramAuthUpdates();
+    TelegramAuthUpdates() = default;
 
 
-    void CheckAuthError(TdObject object)
+    initTelegramAuthUpdates()
     {
-        if(object->get_id() == td_api::error::ID)
-        {
-            auto error = td::move_tl_object_as<td_api::error>(object);
-            std::cout << "Error: " << td_api::to_string(error) << std::flush;
-            OnAuthStateUpdate();
-        }
+        TelegramCLI = static_cast<T*>(this);
     }
 
 
-    auto CreateAuthQueryHandler()
-    {
-        return [this, id = AuthQueryID](TdObject object)
-        {
-            if(id == AuthQueryID)
-            {
-                CheckAuthError(std::move(object));
-            }
-        };
-    }
 
-
-    // See descriptions for this funtions elsewhere.
-    virtual void AuthorizationComplete();
-    virtual void AuthorizationLoggingOut();
-    virtual void AuthorizationClosing();
-    virtual void AuthorizationClosed();
-    virtual void AuthorizationRequirePhoneNumber();
-    virtual void AuthorizationPremiumRequired();
-    virtual void AuthorizationRequireEmailAddress();
-    virtual void AuthorizationRequireEmailCode();
-    virtual void AuthorizationRequireAuthCode();
-    virtual void AuthorizationRequireRegistration();
-    virtual void AuthorizationRequireAuthPassword();
-    virtual void AuthorizationRequireAnotherDeviceConfirmation();
-    virtual void AuthorizationSetTdLibParameters();
+    
+    void AuthorizationLoggingOut();
+    void AuthorizationClosing();
+    void AuthorizationClosed();
+    void AuthorizationRequirePhoneNumber();
+    void AuthorizationPremiumRequired();
+    void AuthorizationRequireEmailAddress();
+    void AuthorizationRequireEmailCode();
+    void AuthorizationRequireAuthCode();
+    void AuthorizationRequireRegistration();
+    void AuthorizationRequireAuthPassword();
+    void AuthorizationRequireAnotherDeviceConfirmation();
+    void AuthorizationSetTdLibParameters();
 
 
     /**
@@ -129,6 +112,16 @@ public:
     }
 
 
+private:
+    T* TelegramCLI;
+    
+    TdAuthorizationState AuthorizationState;
+    
+    std::uint64_t AuthQueryID{0};
+
+
+
+    // !WARN: Uselesss peace of crap.
     void CheckAuthenticationError(TdObject Object)
     {
         if(Object->get_id() == td_api::error::ID)
@@ -140,6 +133,8 @@ public:
     }
 
 
+
+    // !WARN: Uselesss peace of crap.
     auto CreateAuthenticationQueryHandler()
     {
         return [this, id = AuthQueryID](TdObject Object)
@@ -151,9 +146,126 @@ public:
         };
     }
 
-    
-    std::uint64_t AuthQueryID{0};
 
-private:
 
+    // Authorization state is complete.
+    void AuthorizationComplete()
+    {
+        bIsAuthorized = true;
+    }
+
+
+
+    // Logging out.
+    void AuthorizationLoggingOut()
+    {
+        bIsAuthorized = false;
+    }
+
+
+
+    // Closing state.
+    void AuthorizationClosing()
+    {
+       // !TODO: I will need to add closing scene.
+    }
+
+
+
+    // Close state.
+    void AuthorizationClosed()
+    {
+        bIsAuthorized = false;
+        bIsRestartRequired = true;
+    }
+
+
+
+    // Authorization through the phone number.
+    void AuthorizationRequirePhoneNumber()
+    {
+        std::string PhoneNumber;
+        atomic<bool> OnProcess = false;
+        T->RenderPhoneAuthScene(PhoneNumber, OnProcess);
+        OnProcess.wait(false);
+        OnProcess.wait(false);
+        T->SendQuery(
+            td_api::make_object<td_api::setAuthenticationPhoneNumber>(PhoneNumber, nullptr),
+            [&](TdObject Object)
+            {
+
+            }
+        );
+    }
+
+
+
+    // Telegram Premium subscription is required to continue authorization.
+    void AuthorizationPremiumRequired()
+    {
+        T->RenderPremiumRequiredAuthScene();
+    }
+
+
+
+    // Authorization through the email.
+    void AuthorizationRequireEmailAddress()
+    {
+        std::string EmailAddress;
+        atomic<bool> OnProcess = false;
+        T->RenderEmailAuthScene(EmailAddress, OnProcess);
+        OnProcess.wait(false);
+        T->SendQuery(
+            td_api::make_object<td_api::setAuthenticationEmailAddress>(EmailAddress),
+            [&](TdObject Object)
+            {
+                
+            }
+        );
+    }
+
+
+
+    // Authorization requires code from the email.
+    void AuthorizationRequireEmailCode()
+    {
+        using std::chrono_literals;
+        std::string EmailCode;
+        std::atomic<bool> OnProcess = false;
+        std::atomic<bool> ValidationFailedActive = false;
+        T->RenderEmailCodeAuthScene(EmailCode, OnProcess, ValidationFailedActive);
+        OnProcess.wait(false);
+        T->SendQuery(
+            td_api::make_object<td_api::checkAuthenticationEmailCode>(
+                td_api::make_object<td_api::emailAddressAuthenticationCode>(EmailCode)),
+            [&](TdObject Object)
+            {
+                if(Object->get_id() != td_api::error::ID) return;
+                auto error = td_api::move_object_as<TdErrorT>(Object);
+                if(message == "EMAIL_CODE_INVALID")
+                {
+                    T->SendQuery(
+                        td_api::make_object<td_api::resendAuthenticationCode>(td_api::make_object<td_api::resendCodeReasonVerificationFailed>),
+                        [&](TdObject Object)
+                        {
+                            if(Object->get_id() != td_api::error::ID) return;
+                            auto error = td_api::move_object_as<TdErrorT>(Object);
+
+                            
+                        }
+                    );
+                }
+                else if(message == "EMAIL_CODE_EXPIRED")
+                {
+
+                }
+                else if(message.find("FLOOD_WAIT_") == 0)
+                {
+                    std::string FloodMessage = error->message_;
+                    FloodMessage.erase(0, 12);
+                    RenderFloodWaitScene(error->message_, std::stoi(FloodMessage) * 1s);
+                }
+            }
+        );
+    }
 };
