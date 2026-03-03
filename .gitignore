@@ -2,13 +2,37 @@
 .env
 
 # Exclude temp directory.
-/temp
+temp
 
 
 # Exclude build directories.
-/build
-/bin
+build
+bin
+
+
+# Exclude thirdparty build directories.
+thirdparty/*/*
+thirdparty/*/*.conf
+!thirdparty/*/@*
 
 
 # Exclude IDE's info.
-/.vscode
+.vscode
+
+
+# Exclude any caches.
+__pycache__
+
+
+# Some lately deprecated files.
+scripts/configure.py
+scripts/depmanager.py
+
+
+# Exclude lib.
+lib
+
+
+# Eclude include.
+include
+!include/convinient_string.hpp
